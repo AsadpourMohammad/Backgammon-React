@@ -1,10 +1,7 @@
 .barWrapper {
-  height: 250px;
-  width: 40px;
+  /* height: 500px;
+    width: 40px; */
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .bar {
@@ -13,14 +10,12 @@
   left: 0;
   display: flex;
   flex-direction: column;
-  align-content: center;
-  height: 100%;
 }
 
-/* .polygon {
+.polygon {
   fill: rgb(100, 75, 65);
-} */
+}
 
 .barWrapper:hover .polygon {
-  fill: #9ca10d;
+  fill: yellow;
 }

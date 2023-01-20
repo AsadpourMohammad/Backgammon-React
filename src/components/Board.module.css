@@ -1,12 +1,13 @@
 .board {
   width: 700px;
   height: 600px;
-  background: rgb(244, 231, 199);
+  background: black;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 5px;
-  border: 30px solid rgb(161, 118, 56);
+  border: 10px solid black;
   align-items: center;
   align-content: space-between;
   margin-bottom: 10px;
+  margin: 10px;
 }

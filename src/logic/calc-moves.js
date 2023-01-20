@@ -1,36 +1,12 @@
-export const initialState = () => {
-  return [
-    ["White", "White", "White", "White", "White"],
-    [],
-    [],
-    [],
-    ["Black", "Black", "Black"],
-    [],
-    ["Black", "Black", "Black", "Black", "Black"],
-    [],
-    [],
-    [],
-    [],
-    ["White", "White"],
-    ["Black", "Black", "Black", "Black", "Black"],
-    [],
-    [],
-    [],
-    ["White", "White", "White"],
-    [],
-    ["White", "White", "White", "White", "White"],
-    [],
-    [],
-    [],
-    [],
-    ["Black", "Black"],
-  ];
-};
+import { toast } from "react-hot-toast";
+import { toastStyle } from "../App";
+import { calcEndingDiceBars } from "./endgame";
 
 export function calcPossibleMoves(
   fromBarIdx,
   board,
   turn,
+  opponent,
   firstDice,
   secondDice
 ) {
@@ -38,7 +14,6 @@ export function calcPossibleMoves(
   if (secondDice === null) secondDice = 0;
 
   const canGoTo = [];
-  const opponent = turn === "White" ? "Black" : "White";
 
   for (let i = 0; i < board.length; i++) {
     var toBar = board[i];
@@ -132,59 +107,62 @@ export function calcGettingOutOfOutMoves(board, turn, firstDice, secondDice) {
   return canGoTo;
 }
 
-export function readyToEnd(board, turn) {
+export function hasPossibleMove(
+  turn,
+  opponent,
+  board,
+  dices,
+  whiteOutPieces,
+  blackOutPieces
+) {
+  const outPieces =
+    turn === "White" ? [...whiteOutPieces] : [...blackOutPieces];
+  if (outPieces.length !== 0) {
+    const canGoTo = calcGettingOutOfOutMoves(board, turn, dices[0], dices[1]);
+    return canGoTo.length !== 0;
+  }
+
   const containing = [];
   board.map((bar, barIdx) => {
-    if (bar.includes(turn.current)) containing.push(barIdx);
+    if (bar.includes(turn)) containing.push(barIdx);
   });
 
-  if (turn === "White") {
-    for (let i = 0; i < containing.length; i++) {
-      const barIdx = containing[i];
+  const allMoves = [];
+  containing.map((barIdx) => {
+    const canGoTo = calcPossibleMoves(barIdx, board, turn, opponent, dices[0], dices[1]);
 
-      if (barIdx < 6 || barIdx > 11) {
-        return false;
-      }
-    }
-  } else {
-    for (let i = 0; i < containing.length; i++) {
-      const barIdx = containing[i];
+    canGoTo.map((barIdx) => allMoves.push(barIdx));
+  });
 
-      if (barIdx < 18) {
-        return false;
-      }
-    }
-  }
+  const endingDiceBars = calcEndingDiceBars(board, turn, dices[0], dices[1]);
+  endingDiceBars.map((barIdx) => allMoves.push(barIdx));
 
-  return true;
+  return allMoves.length !== 0;
 }
 
-export function calcEndingDiceBars(board, turn, firstDice, secondDice) {
-  const canGoFrom = [];
-  if (turn === "White") {
-    if (firstDice > 0 && board[24 - firstDice].includes(turn)) {
-      canGoFrom.push(24 - firstDice);
-    }
+export function checkCantMove(
+  board,
+  rolledDice,
+  dices,
+  turn,
+  opponent,
+  whiteOutPieces,
+  blackOutPieces,
+  changeTurn,
+  setToDefault
+) {
+  if (
+    rolledDice &&
+    !hasPossibleMove(turn, opponent, board, dices, whiteOutPieces, blackOutPieces)
+  ) {
+    toast.error(
+      "You have no possible moves.\nTurn changes to opponent.",
+      toastStyle
+    );
 
-    if (
-      secondDice > 0 &&
-      firstDice !== secondDice &&
-      board[24 - secondDice].includes(turn)
-    ) {
-      canGoFrom.push(24 - secondDice);
-    }
-  } else {
-    if (firstDice > 0 && board[12 - firstDice].includes(turn)) {
-      canGoFrom.push(12 - firstDice);
-    }
+    changeTurn();
+    setToDefault();
 
-    if (
-      secondDice > 0 &&
-      firstDice !== secondDice &&
-      board[12 - secondDice].includes(turn)
-    ) {
-      canGoFrom.push(12 - secondDice);
-    }
-  }
-  return canGoFrom;
+    return true;
+  } else return false;
 }

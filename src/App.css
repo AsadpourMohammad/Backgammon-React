@@ -12,7 +12,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #141415;
   color: rgba(255, 255, 255, 0.87);
   cursor: pointer;
   transition: border-color 0.25s;
@@ -27,19 +27,21 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.top {
+.board-top {
   background-color: black;
-  border: 10px solid white;
+  border: 10px solid #141415;
   border-bottom: 0;
   padding: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-left: 25px;
+  padding-right: 25px;
 }
 
-.bottom {
+.board-bottom {
   background-color: black;
-  border: 10px solid white;
+  border: 10px solid #141415;
   padding: 15px;
   display: flex;
   justify-content: space-between;

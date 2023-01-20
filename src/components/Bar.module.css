@@ -1,0 +1,22 @@
+.barWrapper {
+  height: 250px;
+  width: 40px;
+  position: relative;
+}
+
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.polygon {
+  fill: rgb(100, 75, 65);
+}
+
+.barWrapper:hover .polygon {
+  fill: yellow;
+}

@@ -1,43 +1,18 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
 
-export function changingTurn(
-  turn,
-  whiteOutBar,
-  whiteEndBar,
-  blackOutBar,
-  blackEndBar
-) {
-  turn = turn === "White" ? "Black" : "White";
-  var opponent = turn === "White" ? "Black" : "White";
+export function changingTurn(turn, opponent, whitePlayer, blackPlayer) {
+  turn = turn === whitePlayer ? blackPlayer : whitePlayer;
+  opponent = turn === whitePlayer ? blackPlayer : whitePlayer;
 
-  var turnOutBar = turn === "White" ? [...whiteOutBar] : [...blackOutBar];
-  var turnOutBarIdx = turn === "White" ? "WhiteOutBar" : "BlackOutBar";
+  toast.success("Turn is now: " + turn.player, toastStyle(turn));
 
-  var opponentOutBar =
-    opponent === "White" ? [...whiteOutBar] : [...blackOutBar];
-
-  var turnEndBar = turn === "White" ? [...whiteEndBar] : [...blackEndBar];
-  var turnEndBarIdx = turn === "White" ? "WhiteEndBar" : "BlackEndBar";
-
-  toast.success("Turn is now: " + turn, toastStyle(turn));
-
-  return [
-    turn,
-    opponent,
-    turnOutBar,
-    turnOutBarIdx,
-    turnEndBar,
-    turnEndBarIdx,
-    opponentOutBar,
-  ];
+  return [turn, opponent];
 }
 
 export function calcMovesMade(
   fromBar,
   toBar,
-  turnOutBarIdx,
-  turnEndBarIdx,
   turn,
   dices,
   maxMoves,
@@ -51,12 +26,12 @@ export function calcMovesMade(
     distance = toBar > 11 ? Math.abs(fromBar - toBar) : fromBar + (toBar - 11);
   }
 
-  if (fromBar === turnOutBarIdx) {
-    distance = turn === "White" ? 12 - toBar : 24 - toBar;
+  if (fromBar === turn.outBarIdx) {
+    distance = turn.player === "White" ? 12 - toBar : 24 - toBar;
   }
 
-  if (fromBar === turnEndBarIdx) {
-    var distance = turn === "White" ? 24 - toBar : 12 - toBar;
+  if (fromBar === turn.endBarIdx) {
+    var distance = turn.player === "White" ? 24 - toBar : 12 - toBar;
   }
 
   var moves = distance;

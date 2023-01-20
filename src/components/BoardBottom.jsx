@@ -6,11 +6,10 @@ export default function BoardBottom(props) {
     <div className="board-bottom">
       {createPieceOutBar(
         props.select,
+        props.whitePlayer,
         true,
         true,
-        "WhiteOutBar",
         "#e0ded7",
-        props.whiteOutBar,
         props.fromBarIdx
       )}
 
@@ -18,11 +17,10 @@ export default function BoardBottom(props) {
 
       {createPieceOutBar(
         props.select,
+        props.blackPlayer,
         false,
         false,
-        "BlackOutBar",
         "#232937",
-        props.blackOutBar,
         props.fromBarIdx
       )}
     </div>
@@ -38,29 +36,28 @@ export default function BoardBottom(props) {
 
   function createPieceOutBar(
     select,
+    player,
     isLeft,
     isWhite,
-    outBarIdx,
     fill,
-    outBar,
     fromBarIdx
   ) {
     return (
       <PieceOutBar
         isLeft={isLeft}
-        onClick={() => select(outBarIdx)}
+        onClick={() => select(player.outBarIdx)}
         isWhite={isWhite}
-        key={outBarIdx}
+        key={player.outBarIdx}
         fill={fill}
       >
-        {outBar.map((piece, pieceIdx) =>
+        {player.outBar.map((piece, pieceIdx) =>
           createPieces(
-            outBarIdx,
+            player.outBarIdx,
             piece,
             pieceIdx,
-            fromBarIdx === outBarIdx,
-            (pieceIdx === outBar.length - 1 && outBarIdx === "WhiteOutBar") ||
-              (pieceIdx === 0 && outBarIdx === "BlackOutBar")
+            fromBarIdx === player.outBarIdx,
+            (pieceIdx === player.outBar.length - 1 && player.outBarIdx === "WhiteOutBar") ||
+              (pieceIdx === 0 && player.outBarIdx === "BlackOutBar")
           )
         )}
       </PieceOutBar>

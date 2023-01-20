@@ -1,17 +1,17 @@
 export default class Player {
-    constructor(player, playerOutBarIdx, playEndBarIdx) {
+    constructor(player, outBarIdx, endBarIdx) {
         this.player = player;
-        this.playerOutBar = [];        
-        this.playerOutBarIdx = playerOutBarIdx;
-        this.playEndBar = [];
-        this.playEndBarIdx = playEndBarIdx;
+        this.outBar = [];        
+        this.outBarIdx = outBarIdx;
+        this.endBar = [];
+        this.endBarIdx = endBarIdx;
     }
 
-    setPlayerOutBar(playerOutBar) {
-        this.playerOutBar = playerOutBar;
+    setPlayerOutBar(outBar) {
+        this.outBar = outBar;
     }
 
-    setPlayerEndBar(playEndBar) {
-        this.playEndBar = playEndBar;
+    setPlayerEndBar(endBar) {
+        this.endBar = endBar;
     }
 }

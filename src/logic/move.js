@@ -4,7 +4,7 @@ import { calcMovesMade } from "./logic";
 
 export function settingFromEndBar(index, fromBarIdx, dices, board, turn) {
   if (readyToEnd(board, turn)) {
-    const endingDiceBars = calcEndingDiceBars(board, turn, dices[0], dices[1]);
+    const endingDiceBars = calcEndingDiceBars(board, turn, dices);
 
     if (endingDiceBars.length !== 0) {
       fromBarIdx = index;
@@ -19,8 +19,6 @@ export function settingToBar(
   index,
   fromBarIdx,
   turn,
-  turnOutBarIdx,
-  turnEndBarIdx,
   dices,
   maxMoves,
   checkState,
@@ -33,8 +31,6 @@ export function settingToBar(
   [rolledDice, dices, maxMoves] = calcMovesMade(
     fromBarIdx,
     toBarIdx,
-    turnOutBarIdx,
-    turnEndBarIdx,
     turn,
     dices,
     maxMoves,
@@ -47,20 +43,13 @@ export function settingToBar(
 export function settingFromOutBar(index, board, turn, dices) {
   var fromBarIdx = index;
 
-  const canGoTo = calcGettingOutOfOutMoves(board, turn, dices[0], dices[1]);
+  const canGoTo = calcGettingOutOfOutMoves(board, turn, dices);
 
   return [fromBarIdx, canGoTo];
 }
 
 export function settingFromBar(index, board, turn, opponent, dices) {
-  const canGoTo = calcPossibleMoves(
-    index,
-    board,
-    turn,
-    opponent,
-    dices[0],
-    dices[1]
-  );
+  const canGoTo = calcPossibleMoves(index, board, turn, opponent, dices);
 
   if (canGoTo.length !== 0) {
     var fromBarIdx = index;

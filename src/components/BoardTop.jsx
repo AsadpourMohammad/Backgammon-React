@@ -8,22 +8,20 @@ import { BoardContext } from "../App";
 const BarContext = createContext();
 
 export default function BoardTop() {
-  const { select, board, canGoToArray, whiteEndBar, blackEndBar, fromBarIdx } =
+  const { select, board, canGoToArray, whitePlayer, blackPlayer, fromBarIdx } =
     useContext(BoardContext);
 
   return (
     <div className="board-top">
       {CreateCollectionBar({
-        endBar: whiteEndBar,
-        endBarIdx: "WhiteEndBar",
+        player: whitePlayer,
         fill: "#e0ded7",
       })}
 
       {CreateBoard()}
 
       {CreateCollectionBar({
-        endBar: blackEndBar,
-        endBarIdx: "BlackEndBar",
+        player: blackPlayer,
         fill: "#232937",
       })}
     </div>
@@ -88,13 +86,13 @@ export default function BoardTop() {
 
     return (
       <CollectionBar
-        onClick={() => select(props.endBarIdx)}
+        onClick={() => select(props.player.endBarIdx)}
         isWhite={true}
-        key={props.endBarIdx}
+        key={props.player.endBarIdx}
         fill={props.fill}
       >
-        {props.endBar.map((piece, pieceIdx) =>
-          CreatePieces(props.endBarIdx, piece, pieceIdx, false, false)
+        {props.player.endBar.map((piece, pieceIdx) =>
+          CreatePieces(props.player.endBarIdx, piece, pieceIdx, false, false)
         )}
       </CollectionBar>
     );

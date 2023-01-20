@@ -15,13 +15,16 @@ export function rollingDice(turn) {
     dices.push(dices[0]);
     dices.push(dices[0]);
 
-    toast.success(`🎲 ${turn}: Rolled a Double: ${dices} 🎲`, toastStyle(turn));
+    toast.success(
+      `🎲 ${turn.player}: Rolled a Double: ${dices} 🎲`,
+      toastStyle(turn)
+    );
   } else {
-    toast.success(`🎲 ${turn}: ${dices} 🎲`, toastStyle(turn));
+    toast.success(`🎲 ${turn.player}: ${dices} 🎲`, toastStyle(turn));
   }
 
   var rolledDice = true;
   var maxMoves = dices.reduce((a, b) => a + b, 0);
 
-  return [rolledDice, dices, turn, maxMoves];
+  return [turn, rolledDice, dices, maxMoves];
 }

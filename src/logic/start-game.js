@@ -61,7 +61,7 @@ export function backgammon() {
   );
 }
 
-export function startingGame() {
+export function startingGame(whitePlayer, blackPlayer) {
   var turn;
   var opponent;
 
@@ -70,14 +70,14 @@ export function startingGame() {
     const [blackFirst, blackSecond] = dice();
 
     if (whiteFirst + whiteSecond > blackFirst + blackSecond) {
-      turn = "White";
-      opponent = "Black";
+      turn = whitePlayer;
+      opponent = blackPlayer;
       toast.success("The Game starts with ⚪ WHITE ⚪", toastStyle(turn));
 
       break;
     } else if (whiteFirst + whiteSecond < blackFirst + blackSecond) {
-      turn = "Black";
-      opponent = "White";
+      turn = blackPlayer;
+      opponent = whitePlayer;
       toast.success("The Game starts with ⚫ BLACK ⚫", toastStyle(turn));
 
       break;

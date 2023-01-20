@@ -4,53 +4,63 @@ import { toastStyle } from "../App";
 export function readyToEnd(board, turn) {
   const containing = [];
   board.map((bar, barIdx) => {
-    if (bar.includes(turn)) containing.push(barIdx);
+    if (bar.includes(turn.player)) containing.push(barIdx);
   });
 
-  if (turn === "White") {
-    for (let i = 0; i < containing.length; i++) {
-      const barIdx = containing[i];
+  if (turn.player === "White") {
+    // for (let i = 0; i < containing.length; i++) {
+    //   const barIdx = containing[i];
 
-      if (barIdx < 6 || barIdx > 11) {
-        return false;
-      }
-    }
+    //   if (barIdx < 6 || barIdx > 11) {
+    //     return false;
+    //   }
+    // }
+
+    containing.map((barIdx) => {
+      if (barIdx < 6 || barIdx > 11) return false;
+    });
   } else {
-    for (let i = 0; i < containing.length; i++) {
-      const barIdx = containing[i];
+    // for (let i = 0; i < containing.length; i++) {
+    //   const barIdx = containing[i];
 
-      if (barIdx < 18) {
-        return false;
-      }
-    }
+    //   if (barIdx < 18) {
+    //     return false;
+    //   }
+    // }
+
+    containing.map((barIdx) => {
+      if (barIdx < 18) return false;
+    });
   }
 
   return true;
 }
 
-export function calcEndingDiceBars(board, turn, firstDice, secondDice) {
+export function calcEndingDiceBars(board, turn, dices) {
   const canGoFrom = [];
+  const [firstDice, secondDice] = dices;
+
   if (turn === "White") {
-    if (firstDice > 0 && board[24 - firstDice].includes(turn)) {
+    if (firstDice > 0 && board[24 - firstDice].includes(turn.player)) {
       canGoFrom.push(24 - firstDice);
     }
 
     if (
       secondDice > 0 &&
       firstDice !== secondDice &&
-      board[24 - secondDice].includes(turn)
+      board[24 - secondDice].includes(turn.player)
     ) {
       canGoFrom.push(24 - secondDice);
     }
   } else {
-    if (firstDice > 0 && board[12 - firstDice].includes(turn)) {
+    if (firstDice > 0 && board[12 - firstDice].includes(turn.player)) {
       canGoFrom.push(12 - firstDice);
     }
 
     if (
       secondDice > 0 &&
       firstDice !== secondDice &&
-      board[12 - secondDice].includes(turn)
+      board[12 - secondDice].includes(turn.player)
     ) {
       canGoFrom.push(12 - secondDice);
     }
@@ -60,7 +70,7 @@ export function calcEndingDiceBars(board, turn, firstDice, secondDice) {
 
 export function celebrateGameEnd(turn) {
   toast(
-    turn === "White"
+    turn.player === "White"
       ? `⚪ WHITE ⚪ has Won the Game!`
       : `⚫ BLACK ⚫ has Won the Game!`,
     toastStyle(turn)

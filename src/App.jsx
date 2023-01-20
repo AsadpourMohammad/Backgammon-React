@@ -1,17 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import "./App.css";
 import { backgammon, initialState, startingGame } from "./logic/start-game";
-import { readyToEnd, calcEndingDiceBars } from "./logic/endgame";
-import {
-  calcPossibleMoves,
-  calcGettingOutOfOutMoves,
-  checkCantMove,
-} from "./logic/calc-moves";
+import { celebrateGameEnd } from "./logic/endgame";
+import { checkCantMove } from "./logic/calc-moves";
 import { rollingDice } from "./logic/roll-dice";
-import { calcMovesMade, changingTurn } from "./logic/logic";
+import { changingTurn } from "./logic/logic";
 import BoardTop from "./components/BoardTop";
 import BoardBottom from "./components/BoardBottom";
+import {
+  settingFromBar,
+  settingFromEndBar,
+  settingFromOutBar,
+  settingToBar,
+} from "./logic/move";
+import Player from "./logic/player";
 
 export const toastStyle = (turn) => {
   return {
@@ -24,6 +27,8 @@ export const toastStyle = (turn) => {
   };
 };
 
+export const BoardContext = createContext();
+
 function App() {
   const [gameOn, setGameOn] = useState(false);
   const gameOver = useRef(false);
@@ -35,7 +40,10 @@ function App() {
   const opponentOutBar = useRef([]);
   const turnEndBar = useRef([]);
   const turnEndBarIdx = useRef("");
-  const [whiteOutBar, setWhiteOutBar] = useState([]);
+
+  const [whitePlayer, setWhitePlayer] = useState();
+
+  // const [whiteOutBar, setWhiteOutBar] = useState([]);
   const [blackOutBar, setBlackOutBar] = useState([]);
   const [whiteEndBar, setWhiteEndBar] = useState([]);
   const [blackEndBar, setBlackEndBar] = useState([]);
@@ -43,16 +51,28 @@ function App() {
   const dices = useRef([]);
   const moves = useRef(0);
   const maxMoves = useRef(0);
-  const [canGoToArray, setCanGoToArray] = useState([]);
-  const fromBar = useRef(-1);
-  const toBar = useRef(-1);
+  const canGoToArray = useRef([]);
+  const [canGoTo, setCanGoTo] = useState([]);
+  const fromBarIdx = useRef(-1);
+  const toBarIdx = useRef(-1);
 
   window.onload = () => backgammon();
 
   useEffect(() => {
+    if (gameOver.current) {
+      celebrateGameEnd(turn.current);
+      setGameOn(false);
+    }
+  }, [gameOver.current]);
+
+  useEffect(() => {
+    
     turn.current === "White"
-      ? setWhiteOutBar(turnOutBar.current)
+      ? whitePlayer.setPlayerOutBar(turnOutBar.current)
       : setBlackOutBar(turnOutBar.current);
+      
+    setWhitePlayer(whitePlayer);
+
   }, [turnOutBar.current]);
 
   useEffect(() => {
@@ -71,25 +91,32 @@ function App() {
     setGameOn(true);
     gameOver.current = false;
     setBoard(initialState());
-    setWhiteEndBar([]);
+    // setWhiteEndBar([]);
     setBlackEndBar([]);
-    setWhiteOutBar([]);
+    // setWhiteOutBar([]);
     setBlackOutBar([]);
     setToDefault();
+
+    setWhitePlayer(new Player("White", "WhiteOutBar", "WhiteEndBar"));
 
     [turn.current, opponent.current] = startingGame();
   }
 
   function rollDice() {
-    [rolledDice.current, dices.current, turn.current, maxMoves.current] =
-      rollingDice(
-        rolledDice.current,
-        dices.current,
-        turn.current,
-        maxMoves.current
+    if (rolledDice.current) {
+      toast.error(
+        "Play your move before rolling again.\n" +
+          `🎲 ${turn.current}: ${dices.current} 🎲`,
+        toastStyle(turn.current)
       );
 
-    if (canNoLongerMove()) return;
+      return;
+    }
+
+    [rolledDice.current, dices.current, turn.current, maxMoves.current] =
+      rollingDice(turn.current);
+
+    if (rolledDice.current && canNoLongerMove()) return;
   }
 
   function setToDefault() {
@@ -110,7 +137,7 @@ function App() {
       opponentOutBar.current,
     ] = changingTurn(
       turn.current,
-      whiteOutBar,
+      whitePlayer,
       whiteEndBar,
       blackOutBar,
       blackEndBar
@@ -120,7 +147,6 @@ function App() {
   function canNoLongerMove() {
     var cantMove = checkCantMove(
       board,
-      rolledDice.current,
       dices.current,
       turn.current,
       opponent.current,
@@ -133,24 +159,23 @@ function App() {
     return cantMove;
   }
 
-  function checkState(from, to) {
+  function checkState(fromIdx, toIdx) {
     const currBoard = [...board];
 
     // Throwing opponent piece out
-    if (currBoard[to].includes(opponent.current)) {
-      opponentOutBar.current.push(currBoard[to].pop());
+    if (currBoard[toIdx].includes(opponent.current)) {
+      opponentOutBar.current.push(currBoard[toIdx].pop());
     }
 
     // Returning an out piece
-    if (from === turnOutBarIdx.current) {
-      currBoard[to].push(turnOutBar.current.pop());
-
+    if (fromIdx === turnOutBarIdx.current) {
+      currBoard[toIdx].push(turnOutBar.current.pop());
       return;
     }
 
     // Taking a piece out to end bar
-    if (from === turnEndBarIdx.current) {
-      turnEndBar.current.push(currBoard[to].pop());
+    if (fromIdx === turnEndBarIdx.current) {
+      turnEndBar.current.push(currBoard[toIdx].pop());
 
       if (turnEndBar.current.length === 15) {
         gameOver.current = true;
@@ -160,199 +185,139 @@ function App() {
     }
 
     // Moving from 'from' to 'to
-    currBoard[to].push(currBoard[from].pop());
+    currBoard[toIdx].push(currBoard[fromIdx].pop());
 
     setBoard(currBoard);
   }
 
   function select(index) {
+    function returnToDefault() {
+      fromBarIdx.current = -1;
+      toBarIdx.current = -1;
+      canGoToArray.current = [];
+      setCanGoTo(canGoToArray.current);
+    }
+
     if (!gameOn) {
-      toast.error("Begin a game first!", toastStyle(turn.current));
+      toast.error("Begin a Game first!", toastStyle(turn.current));
       return;
     }
+
     if (!rolledDice.current) {
       toast.error("Roll a dice first!", toastStyle(turn.current));
       return;
     }
 
-    if (canNoLongerMove()) return;
+    if (index === fromBarIdx.current) {
+      returnToDefault();
+      return;
+    }
 
     if (
-      rolledDice &&
-      fromBar.current === -1 &&
-      readyToEnd(board, turn.current) &&
-      index === turnEndBarIdx.current
+      turnOutBar.current.length !== 0 &&
+      fromBarIdx.current !== turnOutBarIdx.current &&
+      index !== turnOutBarIdx.current
     ) {
-      const endingDiceBars = calcEndingDiceBars(
-        board,
-        turn.current,
-        dices.current[0],
-        dices.current[1]
+      toast.error(
+        "You have to play you out pieces first.",
+        toastStyle(turn.current)
       );
+      return;
+    }
 
-      if (endingDiceBars.length !== 0) {
-        fromBar.current = index;
-        setCanGoToArray(endingDiceBars);
-      }
+    // End Bar
+    if (fromBarIdx.current === -1 && index === turnEndBarIdx.current) {
+      [fromBarIdx.current, canGoToArray.current] = settingFromEndBar(
+        index,
+        fromBarIdx.current,
+        dices.current,
+        board,
+        turn.current
+      );
+      setCanGoTo(canGoToArray.current);
       return;
     } else if (
-      rolledDice &&
-      fromBar.current === turnEndBarIdx.current &&
-      index !== fromBar.current &&
-      toBar.current === -1 &&
-      canGoToArray.includes(index)
+      canGoToArray.current.includes(index) &&
+      fromBarIdx.current === turnEndBarIdx.current
     ) {
-      toBar.current = index;
-      checkState(fromBar.current, toBar.current);
-
-      if (gameOver.current) {
-        if (turn.current === "White") {
-          toast(
-            `Game Over!
-            ⚪ WHITE ⚪ has Won the Game!`,
-            toastStyle(turn.current)
-          );
-        } else {
-          toast(
-            `Game Over!
-            ⚫ BLACK ⚫ has Won the Game!`,
-            toastStyle(turn.current)
-          );
-        }
-
-        setGameOn(false);
-
-        fromBar.current = -1;
-        toBar.current = -1;
-        setCanGoToArray([]);
-
-        if (canNoLongerMove()) return;
-
-        return;
-      }
-
-      [rolledDice.current, dices.current, maxMoves.current] = calcMovesMade(
-        fromBar.current,
-        toBar.current,
+      [rolledDice.current, dices.current, maxMoves.current] = settingToBar(
+        index,
+        fromBarIdx.current,
+        turn.current,
         turnOutBarIdx.current,
         turnEndBarIdx.current,
-        turn.current,
         dices.current,
         maxMoves.current,
+        checkState,
         changeTurn
       );
 
-      // return to default for next turn
-      fromBar.current = -1;
-      toBar.current = -1;
-      setCanGoToArray([]);
-
-      if (canNoLongerMove()) return;
+      returnToDefault();
       return;
     }
 
-    if (
-      rolledDice.current &&
-      turnOutBar.current.length !== 0 &&
-      index === fromBar.current
-    ) {
-      fromBar.current = -1;
-      setCanGoToArray([]);
-      return;
-    } else if (
-      rolledDice.current &&
-      turnOutBar.current.length !== 0 &&
-      index === turnOutBarIdx.current
-    ) {
-      fromBar.current = index;
-
-      const canGoTo = calcGettingOutOfOutMoves(
+    // Out Bar
+    if (turnOutBar.current.length !== 0 && index === turnOutBarIdx.current) {
+      [fromBarIdx.current, canGoToArray.current] = settingFromOutBar(
+        index,
         board,
         turn.current,
-        dices.current[0],
-        dices.current[1]
+        dices.current
       );
 
-      setCanGoToArray(canGoTo);
+      setCanGoTo(canGoToArray.current);
       return;
     }
 
-    if (
-      rolledDice.current &&
-      fromBar.current === -1 &&
-      board[index].length != 0 &&
-      board[index].includes(turn.current)
-    ) {
-      if (turnOutBar.current.length !== 0 && index !== turnOutBarIdx.current) {
-        toast.error(
-          "You have to play you out pieces first.",
-          toastStyle(turn.current)
-        );
-        return;
-      }
-
-      const canGoTo = calcPossibleMoves(
+    // Bar
+    if (fromBarIdx.current === -1 && board[index].includes(turn.current)) {
+      [fromBarIdx.current, canGoToArray.current] = settingFromBar(
         index,
         board,
         turn.current,
         opponent.current,
-        dices.current[0],
-        dices.current[1]
+        dices.current
       );
 
-      if (canGoTo.length !== 0) {
-        fromBar.current = index;
-        setCanGoToArray(canGoTo);
-      } else {
-        return;
-      }
+      setCanGoTo(canGoToArray.current);
     } else if (
-      rolledDice.current &&
-      index !== fromBar.current &&
-      toBar.current === -1 &&
-      (!board[index].includes(opponent.current) ||
-        (board[index].includes(opponent.current) &&
-          board[index].length === 1)) &&
-      canGoToArray.includes(index)
+      toBarIdx.current === -1 &&
+      canGoToArray.current.includes(index)
     ) {
-      toBar.current = index;
-      checkState(fromBar.current, toBar.current);
-
-      [rolledDice.current, dices.current, maxMoves.current] = calcMovesMade(
-        fromBar.current,
-        toBar.current,
+      [rolledDice.current, dices.current, maxMoves.current] = settingToBar(
+        index,
+        fromBarIdx.current,
+        turn.current,
         turnOutBarIdx.current,
         turnEndBarIdx.current,
-        turn.current,
         dices.current,
         maxMoves.current,
+        checkState,
         changeTurn
       );
 
-      // return to default for next turn
-      fromBar.current = -1;
-      toBar.current = -1;
-
-      setCanGoToArray([]);
-    } else if (rolledDice.current && index === fromBar.current) {
-      fromBar.current = -1;
-      setCanGoToArray([]);
+      returnToDefault();
     }
 
-    console.log(fromBar.current);
-    if (canNoLongerMove()) return;
+    if (rolledDice.current && canNoLongerMove()) {
+      return;
+    }
   }
 
   return (
     <>
-      <BoardTop
-        select={select}
-        board={board}
-        canGoToArray={canGoToArray}
-        whiteEndBar={whiteEndBar}
-        blackEndBar={blackEndBar}
-        fromBarIdx={fromBar.current}
-      />
+      <BoardContext.Provider
+        value={{
+          select,
+          board,
+          canGoToArray: canGoTo,
+          whiteEndBar,
+          blackEndBar,
+          fromBarIdx: fromBarIdx.current,
+        }}
+      >
+        <BoardTop />
+      </BoardContext.Provider>
 
       <BoardBottom
         select={select}
@@ -361,7 +326,7 @@ function App() {
         rollDice={rollDice}
         whiteOutBar={whiteOutBar}
         blackOutBar={blackOutBar}
-        fromBarIdx={fromBar.current}
+        fromBarIdx={fromBarIdx.current}
       />
     </>
   );

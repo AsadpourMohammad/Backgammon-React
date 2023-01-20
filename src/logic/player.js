@@ -1,4 +1,4 @@
-class Player {
+export default class Player {
     constructor(player, playerOutBarIdx, playEndBarIdx) {
         this.player = player;
         this.playerOutBar = [];        

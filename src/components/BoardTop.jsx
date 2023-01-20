@@ -1,46 +1,54 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import Bar from "./components/Bar";
 import Board from "./components/Board";
 import CollectionBar from "./components/CollectionBar";
 import Piece from "./components/Piece";
+import { BoardContext } from "../App";
 
-export default function BoardTop(props) {
+const BarContext = createContext();
+
+export default function BoardTop() {
+  const { select, board, canGoToArray, whiteEndBar, blackEndBar, fromBarIdx } =
+    useContext(BoardContext);
+
   return (
     <div className="board-top">
-      <CreateCollectionBar
-        select={props.select}
-        endBar={props.whiteEndBar}
-        endBarIdx={"WhiteEndBar"}
-        fill={"#e0ded7"}
-      />
+      {CreateCollectionBar({
+        endBar: whiteEndBar,
+        endBarIdx: "WhiteEndBar",
+        fill: "#e0ded7",
+      })}
 
-      {createBoard(
-        props.board,
-        props.canGoToArray,
-        props.select,
-        props.fromBarIdx
-      )}
+      {CreateBoard()}
 
-      <CreateCollectionBar
-        select={props.select}
-        endBar={props.blackEndBar}
-        endBarIdx={"BlackEndBar"}
-        fill={"#232937"}
-      />
+      {CreateCollectionBar({
+        endBar: blackEndBar,
+        endBarIdx: "BlackEndBar",
+        fill: "#232937",
+      })}
     </div>
   );
 
-  function createBoard(board, canGoToArray, select, fromBarIdx) {
+  function CreateBoard() {
     return (
       <Board>
-        {board.map((bar, barIdx) =>
-          createBars(bar, barIdx, canGoToArray, select, fromBarIdx)
-        )}
+        {board.map((bar, barIdx) => (
+          <BarContext.Provider
+            value={{
+              bar,
+              barIdx,
+            }}
+          >
+            <CreateBars></CreateBars>
+          </BarContext.Provider>
+        ))}
       </Board>
     );
   }
 
-  function createBars(bar, barIdx, canGoToArray, select, fromBarIdx) {
+  function CreateBars() {
+    const { bar, barIdx } = useContext(BarContext);
+
     return (
       <Bar
         isTopRow={barIdx > 11}
@@ -60,44 +68,49 @@ export default function BoardTop(props) {
           (barIdx % 2 !== 0 && barIdx > 11 && true)
         }
       >
-        {bar.map((piece, pieceIdx) =>
-          createPieces(
-            barIdx,
-            piece,
-            pieceIdx,
-            fromBarIdx === barIdx,
-            (pieceIdx === 0 && barIdx > 11) ||
+        {bar.map((piece, pieceIdx) => (
+          <CreatePieces
+            piece={piece}
+            pieceIdx={pieceIdx}
+            included={fromBarIdx === barIdx}
+            rightPiece={
+              (pieceIdx === 0 && barIdx > 11) ||
               (pieceIdx === bar.length - 1 && barIdx <= 11)
-          )
-        )}
+            }
+          ></CreatePieces>
+        ))}
       </Bar>
     );
   }
 
   function CreateCollectionBar(props) {
+    const { select } = useContext(BoardContext);
+
     return (
       <CollectionBar
-        onClick={() => props.select(props.endBarIdx)}
+        onClick={() => select(props.endBarIdx)}
         isWhite={true}
         key={props.endBarIdx}
         fill={props.fill}
       >
         {props.endBar.map((piece, pieceIdx) =>
-          createPieces(props.endBarIdx, piece, pieceIdx, false, false)
+          CreatePieces(props.endBarIdx, piece, pieceIdx, false, false)
         )}
       </CollectionBar>
     );
   }
 
-  function createPieces(barIdx, piece, pieceIdx, included, rightPiece) {
+  function CreatePieces(props) {
+    const { barIdx } = useContext(BarContext);
+
     return (
       <Piece
-        key={`${barIdx}-${pieceIdx}`}
+        key={`${barIdx}-${props.pieceIdx}`}
         border={
-          (included && rightPiece && "3px solid #671010") ||
-          (piece !== "White" ? "1px solid white" : "1px solid black")
+          (props.included && props.rightPiece && "2px solid #671010") ||
+          (props.piece !== "White" ? "1px solid #e9e2d6" : "1px solid black")
         }
-        color={piece}
+        color={props.piece}
       />
     );
   }

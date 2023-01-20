@@ -8,17 +8,8 @@ export function dice() {
   return [first, second];
 }
 
-export function rollingDice(rolledDice, dices, turn, maxMoves) {
-  if (rolledDice) {
-    toast.error(
-      "Play your move before rolling again.\n" + `🎲 ${turn}: ${dices} 🎲`,
-      toastStyle(turn)
-    );
-
-    return [rolledDice, dices, turn, maxMoves];
-  }
-
-  dices = dice();
+export function rollingDice(turn) {
+  var dices = dice();
 
   if (dices[0] === dices[1]) {
     dices.push(dices[0]);
@@ -29,8 +20,8 @@ export function rollingDice(rolledDice, dices, turn, maxMoves) {
     toast.success(`🎲 ${turn}: ${dices} 🎲`, toastStyle(turn));
   }
 
-  rolledDice = true;
-  maxMoves = dices.reduce((a, b) => a + b, 0);
+  var rolledDice = true;
+  var maxMoves = dices.reduce((a, b) => a + b, 0);
 
   return [rolledDice, dices, turn, maxMoves];
 }

@@ -129,7 +129,14 @@ export function hasPossibleMove(
 
   const allMoves = [];
   containing.map((barIdx) => {
-    const canGoTo = calcPossibleMoves(barIdx, board, turn, opponent, dices[0], dices[1]);
+    const canGoTo = calcPossibleMoves(
+      barIdx,
+      board,
+      turn,
+      opponent,
+      dices[0],
+      dices[1]
+    );
 
     canGoTo.map((barIdx) => allMoves.push(barIdx));
   });
@@ -142,7 +149,6 @@ export function hasPossibleMove(
 
 export function checkCantMove(
   board,
-  rolledDice,
   dices,
   turn,
   opponent,
@@ -152,8 +158,14 @@ export function checkCantMove(
   setToDefault
 ) {
   if (
-    rolledDice &&
-    !hasPossibleMove(turn, opponent, board, dices, whiteOutPieces, blackOutPieces)
+    !hasPossibleMove(
+      turn,
+      opponent,
+      board,
+      dices,
+      whiteOutPieces,
+      blackOutPieces
+    )
   ) {
     toast.error(
       "You have no possible moves.\nTurn changes to opponent.",

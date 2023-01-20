@@ -17,10 +17,11 @@
   height: 100%;
 }
 
-/* .polygon {
-  fill: rgb(100, 75, 65);
-} */
-
 .barWrapper:hover .polygon {
-  fill: #9ca10d;
+  fill: #7579ba;
+}
+
+.barWrapper:focus,
+.barWrapper:focus-visible .polygon {
+  outline: 4px auto -webkit-focus-ring-color;
 }

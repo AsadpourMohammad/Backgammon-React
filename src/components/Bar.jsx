@@ -2,13 +2,7 @@ import styles from "./Bar.module.css";
 
 export default function Bar(props) {
   return (
-    <div
-      className={styles.barWrapper}
-      style={{
-        fill: props.fill,
-      }}
-      {...props}
-    >
+    <div className={styles.barWrapper} style={{ fill: props.fill }} {...props}>
       <div
         className={styles.bar}
         style={{ justifyContent: props.isTopRow ? "flex-end" : "initial" }}

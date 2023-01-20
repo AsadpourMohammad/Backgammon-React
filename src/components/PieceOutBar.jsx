@@ -13,9 +13,6 @@ export default function PieceOutBar(props) {
         <polygon
           points={props.isLeft ? "0,0 0,40 250,20" : "0,20 250,0 250,40"}
           className={styles.polygon}
-          style={{
-            fill: props.fill,
-          }}
         />
       </svg>
     </div>

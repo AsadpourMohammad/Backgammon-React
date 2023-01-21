@@ -1,5 +1,6 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
+import Player from "./player";
 
 export function dice() {
   const first = Math.floor(Math.random() * 6) + 1;
@@ -8,7 +9,7 @@ export function dice() {
   return [first, second];
 }
 
-export function rollingDice(turn) {
+export function rollingDice(turn: Player) {
   var dices = dice();
 
   if (dices[0] === dices[1]) {
@@ -23,8 +24,8 @@ export function rollingDice(turn) {
     toast.success(`🎲 ${turn.player}: ${dices} 🎲`, toastStyle(turn));
   }
 
-  var rolledDice = true;
-  var maxMoves = dices.reduce((a, b) => a + b, 0);
+  const rolledDice = true;
+  const maxMoves = dices.reduce((a, b) => a + b, 0);
 
   return [turn, rolledDice, dices, maxMoves];
 }

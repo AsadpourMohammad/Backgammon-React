@@ -8,14 +8,13 @@ export function changingTurn(
   whitePlayer: Player,
   blackPlayer: Player
 ): [Player, Player] {
-  turn = turn === whitePlayer ? blackPlayer : whitePlayer;
-  opponent = turn === whitePlayer ? blackPlayer : whitePlayer;
+  turn = turn.player === blackPlayer.player ? whitePlayer : blackPlayer;
+  opponent = opponent.player === whitePlayer.player ? blackPlayer : whitePlayer;
 
   toast.success("Turn is now: " + turn.player, toastStyle(turn));
 
   return [turn, opponent];
 }
-
 
 export function calcMovesMade(
   fromBarIdx: number | string,

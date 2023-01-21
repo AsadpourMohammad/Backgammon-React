@@ -13,17 +13,13 @@ export function readyToEnd(board: string[][], turn: Player): boolean {
     for (let i = 0; i < containing.length; i++) {
       const barIdx = containing[i];
 
-      if (barIdx < 6 || barIdx > 11) {
-        return false;
-      }
+      if (barIdx < 18) return false;
     }
   } else {
     for (let i = 0; i < containing.length; i++) {
       const barIdx = containing[i];
 
-      if (barIdx < 18) {
-        return false;
-      }
+      if (barIdx < 6 || barIdx > 11) return false;
     }
   }
 

@@ -1,24 +1,18 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import "./App.css";
-import { backgammon, startingGame } from "./logic/start-game";
-import { celebrateGameEnd } from "./logic/endgame";
-import { checkCantMove } from "./logic/calc-moves";
-import { rollingDice } from "./logic/roll-dice";
-import { changingTurn } from "./logic/logic";
-import {
-  settingFromBar,
-  settingFromEndBar,
-  settingFromOutBar,
-  settingToBar,
-} from "./logic/moving";
-import CollectionBar from "./components//CollectionBar";
-import Piece from "./components/Piece";
+import { backgammon, startingGame } from "./logic/events/start-game";
 import Board from "./components/Board";
 import Bar from "./components/Bar";
+import Piece from "./components/Piece";
+import CollectionBar from "./components//CollectionBar";
 import PieceOutBar from "./components/PieceOutBar";
 import Game from "./logic/models/game";
 import ThisTurn from "./logic/models/this-turn";
+import ThisMove from "./logic/models/this-move";
+import { selecting } from "./logic/events/select";
+import { rollingDice } from "./logic/events/roll-dice";
+import { checkCantMove } from "./logic/calculations/calc-possible-moves";
 
 export const toastStyle = (thisTurn: ThisTurn) => {
   return {
@@ -38,26 +32,18 @@ function App() {
   const newGame = () => new Game();
 
   const [game, setGame] = useState(newGame);
-
   const [thisTurn, setThisTurn] = useState({} as ThisTurn);
+  const [thisMove, setThisMove] = useState(new ThisMove());
 
-  const canGoToArray = useRef<number[]>([]);
-  const [canGoTo, setCanGoTo] = useState<number[]>([]);
-
-  const fromBarIdx = useRef<number | string>(-1);
-  const toBarIdx = useRef<number | string>(-1);
-
-  window.onload = () => {
-    backgammon();
-  };
+  window.onload = () => backgammon();
 
   function startGame() {
     const tempGame = newGame();
     tempGame.gameOn = true;
     setGame(tempGame);
 
-    const tempTurn = startingGame(game);
-    setThisTurn(tempTurn);
+    const tempThisTurn = startingGame(game.clone());
+    setThisTurn(tempThisTurn);
   }
 
   function rollDice() {
@@ -71,194 +57,25 @@ function App() {
       return;
     }
 
-    const tempThisTurn = rollingDice(thisTurn);
+    var returnedThisTurn = rollingDice(thisTurn.clone());
 
-    setThisTurn(tempThisTurn);
+    if (returnedThisTurn.rolledDice)
+      returnedThisTurn = checkCantMove(game, returnedThisTurn.clone());
 
-    if (tempThisTurn.rolledDice && canNoLongerMove(tempThisTurn)) return;
-  }
-
-  function changeTurn(game: Game): void {
-    if (game.gameOn) {
-      const tempThisTurn = changingTurn(thisTurn);
-      setThisTurn(tempThisTurn);
-    }
-  }
-
-  function canNoLongerMove(thisTurn: ThisTurn) {
-    const cantMove = checkCantMove(game, thisTurn, changeTurn);
-
-    return cantMove;
-  }
-
-  function checkState(fromIdx: number | string, toIdx: number | string) {
-    const tempGame = game;
-    const tempThisTurn = thisTurn;
-
-    // Throwing opponent piece out
-    if (
-      tempGame.board[toIdx as number].includes(
-        tempThisTurn.opponentPlayer.player
-      )
-    ) {
-      tempThisTurn.opponentPlayer.outBar.push(
-        tempGame.board[toIdx as number].pop() as string
-      );
-
-      tempThisTurn.opponentPlayer.player === tempGame.whitePlayer.player
-        ? (tempGame.whitePlayer = tempThisTurn.opponentPlayer)
-        : (tempGame.blackPlayer = tempThisTurn.opponentPlayer);
-
-      setGame(tempGame);
-    }
-
-    // Returning an out piece
-    if (fromIdx === tempThisTurn.turnPlayer.outBarIdx) {
-      tempGame.board[toIdx as number].push(
-        tempThisTurn.turnPlayer.outBar.pop() as string
-      );
-
-      tempThisTurn.turnPlayer.player === tempGame.whitePlayer.player
-        ? (tempGame.whitePlayer = tempThisTurn.turnPlayer)
-        : (tempGame.blackPlayer = tempThisTurn.turnPlayer);
-
-      setGame(tempGame);
-      return;
-    }
-
-    // Taking a piece out to end bar
-    if (fromIdx === tempThisTurn.turnPlayer.endBarIdx) {
-      tempThisTurn.turnPlayer.endBar.push(
-        tempGame.board[toIdx as number].pop() as string
-      );
-
-      tempThisTurn.turnPlayer.player === tempGame.whitePlayer.player
-        ? (tempGame.whitePlayer = tempThisTurn.turnPlayer)
-        : (tempGame.blackPlayer = tempThisTurn.turnPlayer);
-
-      if (tempThisTurn.turnPlayer.endBar.length === 15) {
-        tempGame.gameOn = false;
-        setGame(tempGame);
-        celebrateGameEnd(tempThisTurn);
-      }
-
-      setGame(tempGame);
-      return;
-    }
-
-    // Moving from 'from' to 'to'
-    tempGame.board[toIdx as number].push(
-      tempGame.board[fromIdx as number].pop() as string
-    );
-
-    setGame(tempGame);
+    setThisTurn(returnedThisTurn);
   }
 
   function select(index: number | string) {
-    const tempGame = game;
-    const tempThisTurn = thisTurn;
+    const [returnedGame, returnedThisTurn, returnedThisMove] = selecting(
+      index,
+      game.clone(),
+      thisTurn.clone(),
+      thisMove.clone()
+    );
 
-    function returnToDefault() {
-      fromBarIdx.current = -1;
-      toBarIdx.current = -1;
-      canGoToArray.current = [];
-      setCanGoTo(canGoToArray.current);
-    }
-
-    if (!tempGame.gameOn) {
-      toast.error("Begin a Game first!", toastStyle(tempThisTurn));
-      return;
-    }
-
-    if (!tempThisTurn.rolledDice) {
-      toast.error("Roll a dice first!", toastStyle(tempThisTurn));
-      return;
-    }
-
-    if (
-      tempThisTurn.turnPlayer.outBar.length !== 0 &&
-      fromBarIdx.current !== tempThisTurn.turnPlayer.outBarIdx &&
-      index !== tempThisTurn.turnPlayer.outBarIdx
-    ) {
-      toast.error(
-        "You have to play you out pieces first.",
-        toastStyle(tempThisTurn)
-      );
-      return;
-    }
-
-    // Deselecting 'from'
-    if (index === fromBarIdx.current) {
-      returnToDefault();
-      return;
-    }
-
-    // Setting 'from' End Bar
-    if (
-      fromBarIdx.current === -1 &&
-      index === tempThisTurn.turnPlayer.endBarIdx
-    ) {
-      [fromBarIdx.current, canGoToArray.current] = settingFromEndBar(
-        tempGame,
-        index,
-        fromBarIdx.current,
-        tempThisTurn
-      );
-
-      setCanGoTo(canGoToArray.current);
-      return;
-    }
-
-    // Setting 'from' Out Bar
-    if (
-      tempThisTurn.turnPlayer.outBar.length !== 0 &&
-      index === tempThisTurn.turnPlayer.outBarIdx
-    ) {
-      [fromBarIdx.current, canGoToArray.current] = settingFromOutBar(
-        tempGame,
-        index,
-        tempThisTurn
-      );
-
-      setCanGoTo(canGoToArray.current);
-      return;
-    }
-
-    // Bar
-    if (
-      fromBarIdx.current === -1 &&
-      tempGame.board[index as number].includes(tempThisTurn.turnPlayer.player)
-    ) {
-      [fromBarIdx.current, canGoToArray.current] = settingFromBar(
-        tempGame,
-        index as number,
-        tempThisTurn
-      );
-
-      setCanGoTo(canGoToArray.current);
-    } else if (
-      toBarIdx.current === -1 &&
-      canGoToArray.current.includes(index as number)
-    ) {
-      const returnedThisTurn = settingToBar(
-        index as number,
-        fromBarIdx.current,
-        tempThisTurn,
-        checkState
-      );
-      setThisTurn(returnedThisTurn);
-
-      returnToDefault();
-
-      if (returnedThisTurn.maxMoves === 0) {
-        changeTurn(tempGame);
-        return;
-      }
-
-      if (returnedThisTurn.rolledDice && canNoLongerMove(returnedThisTurn)) {
-        return;
-      }
-    }
+    setGame(returnedGame);
+    setThisTurn(returnedThisTurn);
+    setThisMove(returnedThisMove);
   }
 
   return (
@@ -285,7 +102,7 @@ function App() {
               onClick={() => select(barIdx)}
               key={barIdx}
               fill={
-                (canGoTo.includes(barIdx) && "#671010") ||
+                (thisMove.canGoTo.includes(barIdx) && "#671010") ||
                 (barIdx % 2 === 0 && barIdx > 11 && "#232937") ||
                 (barIdx % 2 !== 0 && barIdx <= 11 && "#232937") ||
                 (barIdx % 2 === 0 && barIdx <= 11 && "#e0ded7") ||
@@ -297,7 +114,7 @@ function App() {
                 <Piece
                   key={`${barIdx}-${pieceIdx}`}
                   border={
-                    (fromBarIdx.current === barIdx &&
+                    (thisMove.fromBarIdx === barIdx &&
                       ((pieceIdx === 0 && barIdx > 11) ||
                         (pieceIdx === bar.length - 1 && barIdx <= 11)) &&
                       "2px solid #671010") ||
@@ -338,7 +155,7 @@ function App() {
             <Piece
               key={`${game.whitePlayer.outBarIdx}-${pieceIdx}`}
               border={
-                (fromBarIdx.current === game.whitePlayer.outBarIdx &&
+                (thisMove.fromBarIdx === game.whitePlayer.outBarIdx &&
                   pieceIdx === game.whitePlayer.outBar.length - 1 &&
                   "3px solid #671010") ||
                 "1px solid black"
@@ -364,7 +181,7 @@ function App() {
             <Piece
               key={`${game.blackPlayer.outBarIdx}-${pieceIdx}`}
               border={
-                (fromBarIdx.current === game.blackPlayer.outBarIdx &&
+                (thisMove.fromBarIdx === game.blackPlayer.outBarIdx &&
                   pieceIdx === 0 &&
                   "3px solid #671010") ||
                 "1px solid #e9e2d6"

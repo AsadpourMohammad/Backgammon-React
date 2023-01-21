@@ -70,4 +70,14 @@ export default class Game {
   public set blackPlayer(value: Player) {
     this._blackPlayer = value;
   }
+
+  public clone() {
+    const newGame = new Game();
+    newGame.gameOn = this._gameOn;
+    newGame.board = [...this._board];
+    newGame.whitePlayer = this._whitePlayer.clone();
+    newGame.blackPlayer = this.blackPlayer.clone();
+
+    return newGame;
+  }
 }

@@ -1,25 +1,12 @@
-import { toast } from "react-hot-toast";
-import { toastStyle } from "../App";
-import Game from "./models/game";
-import ThisTurn from "./models/this-turn";
-
-export function changingTurn(oldTurn: ThisTurn): ThisTurn {
-  const thisTurn = new ThisTurn(oldTurn.opponentPlayer, oldTurn.turnPlayer, []);
-
-  const turnPlayer =
-    thisTurn.turnPlayer.player === "White" ? "⚪ WHITE ⚪" : "⚫ BLACK ⚫";
-
-  toast.success("Turn is now " + turnPlayer, toastStyle(thisTurn));
-
-  return thisTurn;
-}
+import ThisMove from "../models/this-move";
+import ThisTurn from "../models/this-turn";
 
 export function calcMovesMade(
-  fromBarIdx: number | string,
-  toBarIdx: number,
-  thisTurn: ThisTurn
+  thisTurn: ThisTurn,
+  thisMove: ThisMove
 ): ThisTurn {
   var distance = 0;
+  const [fromBarIdx, toBarIdx] = [thisMove.fromBarIdx, thisMove.toBarIdx];
 
   if (typeof fromBarIdx === "number") {
     if (fromBarIdx <= 11) {
@@ -45,11 +32,11 @@ export function calcMovesMade(
     }
   }
 
-  thisTurn.moves = distance;
+  thisTurn.movesMade = distance;
 
-  if (thisTurn.moves === thisTurn.dices[0]) {
+  if (thisTurn.movesMade === thisTurn.dices[0]) {
     thisTurn.maxMoves -= thisTurn.dices.shift() as number;
-  } else if (thisTurn.moves === thisTurn.dices[1]) {
+  } else if (thisTurn.movesMade === thisTurn.dices[1]) {
     thisTurn.maxMoves -= thisTurn.dices.pop() as number;
   }
 

@@ -1,8 +1,8 @@
 import { toast } from "react-hot-toast";
-import { toastStyle } from "../App";
-import Game from "./models/game";
-import ThisTurn from "./models/this-turn";
+import { toastStyle } from "../../App";
 import { dice } from "./roll-dice";
+import Game from "../models/game";
+import ThisTurn from "../models/this-turn";
 
 export function backgammon() {
   toast(

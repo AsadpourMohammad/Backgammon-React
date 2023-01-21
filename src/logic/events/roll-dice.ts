@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast";
-import { toastStyle } from "../App";
-import ThisTurn from "./models/this-turn";
+import { toastStyle } from "../../App";
+import ThisTurn from "../models/this-turn";
 
 export function dice(): number[] {
   const first = Math.floor(Math.random() * 6) + 1;

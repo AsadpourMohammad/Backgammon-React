@@ -54,10 +54,10 @@ export default class ThisTurn {
     this._dices = value;
   }
 
-  public get moves(): number {
+  public get movesMade(): number {
     return this._movesMade;
   }
-  public set moves(value: number) {
+  public set movesMade(value: number) {
     this._movesMade = value;
   }
 
@@ -66,5 +66,19 @@ export default class ThisTurn {
   }
   public set maxMoves(value: number) {
     this._maxMoves = value;
+  }
+
+  public clone() {
+    const newThisTurn = new ThisTurn(
+      this._turnPlayer,
+      this._opponentPlayer,
+      this._dices
+    );
+
+    newThisTurn.rolledDice = this._rolledDice;
+    newThisTurn.maxMoves = this._maxMoves;
+    newThisTurn.movesMade = this._movesMade;
+
+    return newThisTurn;
   }
 }

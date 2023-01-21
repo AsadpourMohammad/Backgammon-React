@@ -1,15 +1,51 @@
 import { toast } from "react-hot-toast";
-import { toastStyle } from "../App";
-import { calcEndingDiceBars } from "./endgame";
-import Game from "./models/game";
-import ThisTurn from "./models/this-turn";
+import { toastStyle } from "../../App";
+import { changeTurn } from "../events/change-turn";
+import Game from "../models/game";
+import ThisTurn from "../models/this-turn";
+
+export function checkCantMove(game: Game, thisTurn: ThisTurn): ThisTurn {
+  if (game.gameOn && !hasPossibleMove(game, thisTurn)) {
+    toast.error(
+      "You have no possible moves.\nTurn changes to opponent.",
+      toastStyle(thisTurn)
+    );
+
+    thisTurn = changeTurn(game, thisTurn);
+  }
+
+  return thisTurn;
+}
+
+export function hasPossibleMove(game: Game, thisTurn: ThisTurn): boolean {
+  if (thisTurn.turnPlayer.outBar.length !== 0) {
+    const canGoTo = calcGettingOutOfOutMoves(game, thisTurn);
+    return canGoTo.length !== 0;
+  }
+
+  const containing: number[] = [];
+  game.board.map((bar, barIdx) => {
+    if (bar.includes(thisTurn.turnPlayer.player)) containing.push(barIdx);
+  });
+
+  const allMoves: number[] = [];
+  containing.map((barIdx) => {
+    const canGoTo = calcPossibleMoves(game, barIdx, thisTurn);
+
+    canGoTo.map((barIdx) => allMoves.push(barIdx));
+  });
+
+  const endingDiceBars = calcEndingDiceBars(game, thisTurn);
+  endingDiceBars.map((barIdx) => allMoves.push(barIdx));
+
+  return allMoves.length !== 0;
+}
 
 export function calcPossibleMoves(
   game: Game,
   fromBarIdx: number,
   thisTurn: ThisTurn
 ): number[] {
-  
   var [firstDice, secondDice] = thisTurn.dices;
 
   if (firstDice === null) firstDice = 0;
@@ -100,43 +136,40 @@ export function calcGettingOutOfOutMoves(
   return canGoTo;
 }
 
-export function hasPossibleMove(game: Game, thisTurn: ThisTurn): boolean {  
-  if (thisTurn.turnPlayer.outBar.length !== 0) {
-    const canGoTo = calcGettingOutOfOutMoves(game, thisTurn);
-    return canGoTo.length !== 0;
+export function calcEndingDiceBars(game: Game, thisTurn: ThisTurn): number[] {
+  const turnPlayer = thisTurn.turnPlayer.player;
+
+  function includesPlayer(bar: number) {
+    return game.board[bar].includes(turnPlayer);
   }
 
-  const containing: number[] = [];
-  game.board.map((bar, barIdx) => {
-    if (bar.includes(thisTurn.turnPlayer.player)) containing.push(barIdx);
-  });
+  const canGoFrom: number[] = [];
+  const [firstDice, secondDice] = thisTurn.dices;
 
-  const allMoves: number[] = [];
-  containing.map((barIdx) => {
-    const canGoTo = calcPossibleMoves(game, barIdx, thisTurn);
+  if (turnPlayer === "White") {
+    if (firstDice > 0 && includesPlayer(24 - firstDice)) {
+      canGoFrom.push(24 - firstDice);
+    }
 
-    canGoTo.map((barIdx) => allMoves.push(barIdx));
-  });
+    if (
+      secondDice > 0 &&
+      firstDice !== secondDice &&
+      includesPlayer(24 - secondDice)
+    ) {
+      canGoFrom.push(24 - secondDice);
+    }
+  } else {
+    if (firstDice > 0 && includesPlayer(12 - firstDice)) {
+      canGoFrom.push(12 - firstDice);
+    }
 
-  const endingDiceBars = calcEndingDiceBars(game, thisTurn);
-  endingDiceBars.map((barIdx) => allMoves.push(barIdx));
-
-  return allMoves.length !== 0;
-}
-
-export function checkCantMove(
-  game: Game,
-  thisTurn: ThisTurn,
-  changeTurn: Function
-) {
-  if (game.gameOn && !hasPossibleMove(game, thisTurn)) {
-    toast.error(
-      "You have no possible moves.\nTurn changes to opponent.",
-      toastStyle(thisTurn)
-    );
-
-    changeTurn(game);
-
-    return true;
-  } else return false;
+    if (
+      secondDice > 0 &&
+      firstDice !== secondDice &&
+      includesPlayer(12 - secondDice)
+    ) {
+      canGoFrom.push(12 - secondDice);
+    }
+  }
+  return canGoFrom;
 }

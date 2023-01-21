@@ -36,4 +36,17 @@ export default class Player {
   public get endBarIdx(): string {
     return this._endBarIdx;
   }
+
+  public clone() {
+    const newPlayer = new Player(
+      this._player,
+      this._outBarIdx,
+      this._endBarIdx
+    );
+
+    newPlayer.outBar = [...this.outBar];
+    newPlayer.endBar = [...this.endBar];
+
+    return newPlayer;
+  }
 }

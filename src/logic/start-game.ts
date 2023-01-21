@@ -1,5 +1,6 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
+import Player from "./player";
 import { dice } from "./roll-dice";
 
 export const initialState = () => {
@@ -61,9 +62,9 @@ export function backgammon() {
   );
 }
 
-export function startingGame(whitePlayer, blackPlayer) {
-  var turn;
-  var opponent;
+export function startingGame(whitePlayer: Player, blackPlayer: Player) {
+  var turn: Player;
+  var opponent: Player;
 
   while (true) {
     const [whiteFirst, whiteSecond] = dice();

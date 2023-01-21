@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
-import Player from "./player";
+import ThisTurn from "./models/this-turn";
 
 export function dice(): number[] {
   const first = Math.floor(Math.random() * 6) + 1;
@@ -9,23 +9,24 @@ export function dice(): number[] {
   return [first, second];
 }
 
-export function rollingDice(turn: Player): [Player, boolean, number[], number] {
-  var dices = dice();
+export function rollingDice(tempTurn: ThisTurn) {
+  const thisTurn = new ThisTurn(
+    tempTurn.turnPlayer,
+    tempTurn.opponentPlayer,
+    dice()
+  );
 
-  if (dices[0] === dices[1]) {
-    dices.push(dices[0]);
-    dices.push(dices[0]);
-
+  if (thisTurn.dices[0] === thisTurn.dices[1]) {
     toast.success(
-      `🎲 ${turn.player}: Rolled a Double: ${dices} 🎲`,
-      toastStyle(turn)
+      `🎲 ${thisTurn.turnPlayer.player}: Rolled a Double: ${thisTurn.dices} 🎲`,
+      toastStyle(thisTurn)
     );
   } else {
-    toast.success(`🎲 ${turn.player}: ${dices} 🎲`, toastStyle(turn));
+    toast.success(
+      `🎲 ${thisTurn.turnPlayer.player}: ${thisTurn.dices} 🎲`,
+      toastStyle(thisTurn)
+    );
   }
 
-  var rolledDice = true;
-  var maxMoves = dices.reduce((a, b) => a + b, 0);
-
-  return [turn, rolledDice, dices, maxMoves];
+  return thisTurn;
 }

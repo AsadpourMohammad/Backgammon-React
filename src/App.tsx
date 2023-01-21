@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import "./App.css";
-import { backgammon, initialState, startingGame } from "./logic/start-game";
+import { backgammon, startingGame } from "./logic/start-game";
 import { celebrateGameEnd } from "./logic/endgame";
 import { checkCantMove } from "./logic/calc-moves";
 import { rollingDice } from "./logic/roll-dice";
@@ -11,22 +11,25 @@ import {
   settingFromEndBar,
   settingFromOutBar,
   settingToBar,
-} from "./logic/move";
-import Player from "./logic/player";
+} from "./logic/moving";
 import CollectionBar from "./components//CollectionBar";
 import Piece from "./components/Piece";
 import Board from "./components/Board";
 import Bar from "./components/Bar";
 import PieceOutBar from "./components/PieceOutBar";
-import Game from "./logic/game";
+import Game from "./logic/models/game";
+import ThisTurn from "./logic/models/this-turn";
 
-export const toastStyle = (turn: Player) => {
+export const toastStyle = (thisTurn: ThisTurn) => {
   return {
     style: {
       borderRadius: "10px",
-      background: turn.player,
-      color: turn.player == "White" ? "Black" : "White",
-      border: turn.player === "White" ? "2px solid black" : "2px solid white",
+      background: thisTurn.turnPlayer.player,
+      color: thisTurn.opponentPlayer.player,
+      border:
+        thisTurn.turnPlayer.player === "White"
+          ? "2px solid black"
+          : "2px solid white",
     },
   };
 };
@@ -36,13 +39,7 @@ function App() {
 
   const [game, setGame] = useState(newGame);
 
-  const [turn, setTurn] = useState<Player>({} as Player);
-  const [opponent, setOpponent] = useState<Player>({} as Player);
-
-  const rolledDice = useRef<boolean>(false);
-  const dices = useRef<number[]>([]);
-  const moves = useRef(0);
-  const maxMoves = useRef(0);
+  const [thisTurn, setThisTurn] = useState({} as ThisTurn);
 
   const canGoToArray = useRef<number[]>([]);
   const [canGoTo, setCanGoTo] = useState<number[]>([]);
@@ -58,104 +55,91 @@ function App() {
     const tempGame = newGame();
     tempGame.gameOn = true;
     setGame(tempGame);
-    
-    setToDefault();
 
-    const [theTurn, theOpponent] = startingGame(game);
-
-    setTurn(theTurn);
-    setOpponent(theOpponent);
+    const tempTurn = startingGame(game);
+    setThisTurn(tempTurn);
   }
 
   function rollDice() {
-    if (rolledDice.current) {
+    if (thisTurn.rolledDice) {
       toast.error(
         "Play your move before rolling again.\n" +
-          `🎲 ${turn.player}: ${dices.current} 🎲`,
-        toastStyle(turn)
+          `🎲 ${thisTurn.turnPlayer.player}: ${thisTurn.dices} 🎲`,
+        toastStyle(thisTurn)
       );
 
       return;
     }
 
-    var theTurn: Player;
+    const tempThisTurn = rollingDice(thisTurn);
 
-    [theTurn, rolledDice.current, dices.current, maxMoves.current] =
-      rollingDice(turn);
+    setThisTurn(tempThisTurn);
 
-    setTurn(theTurn);
-
-    if (rolledDice.current && canNoLongerMove()) return;
+    if (tempThisTurn.rolledDice && canNoLongerMove(tempThisTurn)) return;
   }
 
-  function setToDefault() {
-    rolledDice.current = false;
-    dices.current = [];
-    moves.current = 0;
-    maxMoves.current = 0;
-  }
-
-  function changeTurn(game: Game) {
+  function changeTurn(game: Game): void {
     if (game.gameOn) {
-      const [theTurn, theOpponent] = changingTurn(game, turn, opponent);
-
-      setTurn(theTurn);
-      setOpponent(theOpponent);
+      const tempThisTurn = changingTurn(thisTurn);
+      setThisTurn(tempThisTurn);
     }
   }
 
-  function canNoLongerMove() {
-    const cantMove = checkCantMove(
-      game,
-      turn,
-      opponent,
-      dices.current,
-      changeTurn,
-      setToDefault
-    );
+  function canNoLongerMove(thisTurn: ThisTurn) {
+    const cantMove = checkCantMove(game, thisTurn, changeTurn);
 
     return cantMove;
   }
 
   function checkState(fromIdx: number | string, toIdx: number | string) {
     const tempGame = game;
-    const [tempTurn, tempOpponent] = [turn, opponent];
+    const tempThisTurn = thisTurn;
 
     // Throwing opponent piece out
-    if (tempGame.board[toIdx as number].includes(tempOpponent.player)) {
-      tempOpponent.outBar.push(tempGame.board[toIdx as number].pop() as string);
+    if (
+      tempGame.board[toIdx as number].includes(
+        tempThisTurn.opponentPlayer.player
+      )
+    ) {
+      tempThisTurn.opponentPlayer.outBar.push(
+        tempGame.board[toIdx as number].pop() as string
+      );
 
-      tempOpponent.player === tempGame.whitePlayer.player
-        ? (tempGame.whitePlayer = tempOpponent)
-        : (tempGame.blackPlayer = tempOpponent);
+      tempThisTurn.opponentPlayer.player === tempGame.whitePlayer.player
+        ? (tempGame.whitePlayer = tempThisTurn.opponentPlayer)
+        : (tempGame.blackPlayer = tempThisTurn.opponentPlayer);
 
       setGame(tempGame);
     }
 
     // Returning an out piece
-    if (fromIdx === turn.outBarIdx) {
-      tempGame.board[toIdx as number].push(tempTurn.outBar.pop() as string);
+    if (fromIdx === tempThisTurn.turnPlayer.outBarIdx) {
+      tempGame.board[toIdx as number].push(
+        tempThisTurn.turnPlayer.outBar.pop() as string
+      );
 
-      tempTurn.player === tempGame.whitePlayer.player
-        ? (tempGame.whitePlayer = tempTurn)
-        : (tempGame.blackPlayer = tempTurn);
+      tempThisTurn.turnPlayer.player === tempGame.whitePlayer.player
+        ? (tempGame.whitePlayer = tempThisTurn.turnPlayer)
+        : (tempGame.blackPlayer = tempThisTurn.turnPlayer);
 
       setGame(tempGame);
       return;
     }
 
     // Taking a piece out to end bar
-    if (fromIdx === tempTurn.endBarIdx) {
-      tempTurn.endBar.push(tempGame.board[toIdx as number].pop() as string);
+    if (fromIdx === tempThisTurn.turnPlayer.endBarIdx) {
+      tempThisTurn.turnPlayer.endBar.push(
+        tempGame.board[toIdx as number].pop() as string
+      );
 
-      tempTurn.player === tempGame.whitePlayer.player
-        ? (tempGame.whitePlayer = tempTurn)
-        : (tempGame.blackPlayer = tempTurn);
+      tempThisTurn.turnPlayer.player === tempGame.whitePlayer.player
+        ? (tempGame.whitePlayer = tempThisTurn.turnPlayer)
+        : (tempGame.blackPlayer = tempThisTurn.turnPlayer);
 
-      if (tempTurn.endBar.length === 15) {
+      if (tempThisTurn.turnPlayer.endBar.length === 15) {
         tempGame.gameOn = false;
         setGame(tempGame);
-        celebrateGameEnd(turn);
+        celebrateGameEnd(tempThisTurn);
       }
 
       setGame(tempGame);
@@ -172,6 +156,7 @@ function App() {
 
   function select(index: number | string) {
     const tempGame = game;
+    const tempThisTurn = thisTurn;
 
     function returnToDefault() {
       fromBarIdx.current = -1;
@@ -181,21 +166,24 @@ function App() {
     }
 
     if (!tempGame.gameOn) {
-      toast.error("Begin a Game first!", toastStyle(turn));
+      toast.error("Begin a Game first!", toastStyle(tempThisTurn));
       return;
     }
 
-    if (!rolledDice.current) {
-      toast.error("Roll a dice first!", toastStyle(turn));
+    if (!tempThisTurn.rolledDice) {
+      toast.error("Roll a dice first!", toastStyle(tempThisTurn));
       return;
     }
 
     if (
-      turn.outBar.length !== 0 &&
-      fromBarIdx.current !== turn.outBarIdx &&
-      index !== turn.outBarIdx
+      tempThisTurn.turnPlayer.outBar.length !== 0 &&
+      fromBarIdx.current !== tempThisTurn.turnPlayer.outBarIdx &&
+      index !== tempThisTurn.turnPlayer.outBarIdx
     ) {
-      toast.error("You have to play you out pieces first.", toastStyle(turn));
+      toast.error(
+        "You have to play you out pieces first.",
+        toastStyle(tempThisTurn)
+      );
       return;
     }
 
@@ -206,13 +194,15 @@ function App() {
     }
 
     // Setting 'from' End Bar
-    if (fromBarIdx.current === -1 && index === turn.endBarIdx) {
+    if (
+      fromBarIdx.current === -1 &&
+      index === tempThisTurn.turnPlayer.endBarIdx
+    ) {
       [fromBarIdx.current, canGoToArray.current] = settingFromEndBar(
         tempGame,
         index,
         fromBarIdx.current,
-        dices.current,
-        turn
+        tempThisTurn
       );
 
       setCanGoTo(canGoToArray.current);
@@ -220,13 +210,14 @@ function App() {
     }
 
     // Setting 'from' Out Bar
-    if (turn.outBar.length !== 0 && index === turn.outBarIdx) {
+    if (
+      tempThisTurn.turnPlayer.outBar.length !== 0 &&
+      index === tempThisTurn.turnPlayer.outBarIdx
+    ) {
       [fromBarIdx.current, canGoToArray.current] = settingFromOutBar(
         tempGame,
         index,
-        turn,
-        opponent,
-        dices.current
+        tempThisTurn
       );
 
       setCanGoTo(canGoToArray.current);
@@ -236,14 +227,12 @@ function App() {
     // Bar
     if (
       fromBarIdx.current === -1 &&
-      tempGame.board[index as number].includes(turn.player)
+      tempGame.board[index as number].includes(tempThisTurn.turnPlayer.player)
     ) {
       [fromBarIdx.current, canGoToArray.current] = settingFromBar(
         tempGame,
         index as number,
-        turn,
-        opponent,
-        dices.current
+        tempThisTurn
       );
 
       setCanGoTo(canGoToArray.current);
@@ -251,22 +240,24 @@ function App() {
       toBarIdx.current === -1 &&
       canGoToArray.current.includes(index as number)
     ) {
-      [rolledDice.current, dices.current, maxMoves.current] = settingToBar(
-        tempGame,
+      const returnedThisTurn = settingToBar(
         index as number,
         fromBarIdx.current,
-        turn,
-        dices.current,
-        maxMoves.current,
-        checkState,
-        changeTurn
+        tempThisTurn,
+        checkState
       );
+      setThisTurn(returnedThisTurn);
 
       returnToDefault();
-    }
 
-    if (rolledDice.current && canNoLongerMove()) {
-      return;
+      if (returnedThisTurn.maxMoves === 0) {
+        changeTurn(tempGame);
+        return;
+      }
+
+      if (returnedThisTurn.rolledDice && canNoLongerMove(returnedThisTurn)) {
+        return;
+      }
     }
   }
 
@@ -357,7 +348,6 @@ function App() {
           ))}
         </PieceOutBar>
 
-        {console.log(game.gameOn)}
         {game.gameOn ? (
           <button onClick={rollDice}>🎲 roll Dice 🎲</button>
         ) : (

@@ -1,17 +1,16 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
 import { calcEndingDiceBars } from "./endgame";
-import Game from "./game";
-import Player from "./player";
+import Game from "./models/game";
+import ThisTurn from "./models/this-turn";
 
 export function calcPossibleMoves(
   game: Game,
   fromBarIdx: number,
-  turn: Player,
-  opponent: Player,
-  dices: number[]
+  thisTurn: ThisTurn
 ): number[] {
-  var [firstDice, secondDice] = dices;
+  
+  var [firstDice, secondDice] = thisTurn.dices;
 
   if (firstDice === null) firstDice = 0;
   if (secondDice === null) secondDice = 0;
@@ -22,11 +21,11 @@ export function calcPossibleMoves(
     var toBar = game.board[i];
     var toBarIdx = i;
 
-    if (toBar.includes(opponent.player) && toBar.length > 1) {
+    if (toBar.includes(thisTurn.opponentPlayer.player) && toBar.length > 1) {
       continue;
     }
 
-    if (turn.player === "White") {
+    if (thisTurn.turnPlayer.player === "White") {
       if (
         (fromBarIdx <= 11 && toBarIdx <= 11 && toBarIdx >= fromBarIdx) ||
         (fromBarIdx > 11 && toBarIdx > 11 && toBarIdx <= fromBarIdx) ||
@@ -69,45 +68,31 @@ export function calcPossibleMoves(
 
 export function calcGettingOutOfOutMoves(
   game: Game,
-  turn: Player,
-  opponent: Player,
-  dices: number[]
+  thisTurn: ThisTurn
 ): number[] {
-  const canGoTo: number[] = [];
-  const [firstDice, secondDice] = dices;
+  function checkForOpponent(bar: number) {
+    const opponentPlayer = thisTurn.opponentPlayer.player;
+    return (
+      !game.board[bar].includes(opponentPlayer) ||
+      (game.board[bar].includes(opponentPlayer) && game.board[bar].length === 1)
+    );
+  }
 
-  if (turn.player === "White") {
-    if (
-      firstDice > 0 &&
-      (!game.board[12 - firstDice].includes(opponent.player) ||
-        (game.board[12 - firstDice].includes(opponent.player) &&
-          game.board[12 - firstDice].length === 1))
-    ) {
+  const canGoTo: number[] = [];
+  const [firstDice, secondDice] = thisTurn.dices;
+
+  if (thisTurn.turnPlayer.player === "White") {
+    if (firstDice > 0 && checkForOpponent(12 - firstDice)) {
       canGoTo.push(12 - firstDice);
     }
-    if (
-      secondDice > 0 &&
-      (!game.board[12 - secondDice].includes(opponent.player) ||
-        (game.board[12 - secondDice].includes(opponent.player) &&
-          game.board[12 - secondDice].length === 1))
-    ) {
+    if (secondDice > 0 && checkForOpponent(12 - secondDice)) {
       canGoTo.push(12 - secondDice);
     }
   } else {
-    if (
-      firstDice > 0 &&
-      (!game.board[24 - firstDice].includes(opponent.player) ||
-        (game.board[24 - firstDice].includes(opponent.player) &&
-          game.board[24 - firstDice].length === 1))
-    ) {
+    if (firstDice > 0 && checkForOpponent(24 - firstDice)) {
       canGoTo.push(24 - firstDice);
     }
-    if (
-      secondDice > 0 &&
-      (!game.board[24 - secondDice].includes(opponent.player) ||
-        (game.board[24 - secondDice].includes(opponent.player) &&
-          game.board[24 - secondDice].length === 1))
-    ) {
+    if (secondDice > 0 && checkForOpponent(24 - secondDice)) {
       canGoTo.push(24 - secondDice);
     }
   }
@@ -115,34 +100,25 @@ export function calcGettingOutOfOutMoves(
   return canGoTo;
 }
 
-export function hasPossibleMove(
-  game: Game,
-  turn: Player,
-  opponent: Player,
-  dices: number[]
-): boolean {
-  const outPieces =
-    turn === game.whitePlayer
-      ? [...game.whitePlayer.outBar]
-      : [...game.blackPlayer.outBar];
-  if (outPieces.length !== 0) {
-    const canGoTo = calcGettingOutOfOutMoves(game, turn, opponent, dices);
+export function hasPossibleMove(game: Game, thisTurn: ThisTurn): boolean {  
+  if (thisTurn.turnPlayer.outBar.length !== 0) {
+    const canGoTo = calcGettingOutOfOutMoves(game, thisTurn);
     return canGoTo.length !== 0;
   }
 
   const containing: number[] = [];
   game.board.map((bar, barIdx) => {
-    if (bar.includes(turn.player)) containing.push(barIdx);
+    if (bar.includes(thisTurn.turnPlayer.player)) containing.push(barIdx);
   });
 
   const allMoves: number[] = [];
   containing.map((barIdx) => {
-    const canGoTo = calcPossibleMoves(game, barIdx, turn, opponent, dices);
+    const canGoTo = calcPossibleMoves(game, barIdx, thisTurn);
 
     canGoTo.map((barIdx) => allMoves.push(barIdx));
   });
 
-  const endingDiceBars = calcEndingDiceBars(game, turn, dices);
+  const endingDiceBars = calcEndingDiceBars(game, thisTurn);
   endingDiceBars.map((barIdx) => allMoves.push(barIdx));
 
   return allMoves.length !== 0;
@@ -150,20 +126,16 @@ export function hasPossibleMove(
 
 export function checkCantMove(
   game: Game,
-  turn: Player,
-  opponent: Player,
-  dices: number[],
-  changeTurn: Function,
-  setToDefault: Function
-): boolean {
-  if (game.gameOn && !hasPossibleMove(game, turn, opponent, dices)) {
+  thisTurn: ThisTurn,
+  changeTurn: Function
+) {
+  if (game.gameOn && !hasPossibleMove(game, thisTurn)) {
     toast.error(
       "You have no possible moves.\nTurn changes to opponent.",
-      toastStyle(turn)
+      toastStyle(thisTurn)
     );
 
     changeTurn(game);
-    setToDefault();
 
     return true;
   } else return false;

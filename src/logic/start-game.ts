@@ -1,9 +1,8 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
-import Game from "./game";
-import Player from "./player";
+import Game from "./models/game";
+import ThisTurn from "./models/this-turn";
 import { dice } from "./roll-dice";
-
 
 export function backgammon() {
   toast(
@@ -35,28 +34,25 @@ export function backgammon() {
   );
 }
 
-export function startingGame(game: Game): [Player, Player] {  
-  var turn: Player;
-  var opponent: Player;
+export function startingGame(game: Game): ThisTurn {
+  var thisTurn: ThisTurn;
 
   while (true) {
     const [whiteFirst, whiteSecond] = dice();
     const [blackFirst, blackSecond] = dice();
 
     if (whiteFirst + whiteSecond > blackFirst + blackSecond) {
-      turn = game.whitePlayer;
-      opponent = game.blackPlayer;
-      toast.success("The Game starts with ⚪ WHITE ⚪", toastStyle(turn));
+      thisTurn = new ThisTurn(game.whitePlayer, game.blackPlayer, []);
+      toast.success("The Game starts with ⚪ WHITE ⚪", toastStyle(thisTurn));
 
       break;
     } else if (whiteFirst + whiteSecond < blackFirst + blackSecond) {
-      turn = game.blackPlayer;
-      opponent = game.whitePlayer;
-      toast.success("The Game starts with ⚫ BLACK ⚫", toastStyle(turn));
+      thisTurn = new ThisTurn(game.blackPlayer, game.whitePlayer, []);
+      toast.success("The Game starts with ⚫ BLACK ⚫", toastStyle(thisTurn));
 
       break;
     }
   }
 
-  return [turn, opponent];
+  return thisTurn;
 }

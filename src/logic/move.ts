@@ -23,7 +23,7 @@ export function settingFromEndBar(
 }
 
 export function settingToBar(
-  index: number | string,
+  index: number,
   fromBarIdx: number | string,
   turn: Player,
   dices: number[],

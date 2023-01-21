@@ -1,6 +1,13 @@
+import { ReactNode } from "react";
 import styles from "./CollectionBar.module.css";
 
-export default function CollectionBar(props) {
+type Props = {
+  fill: string;
+  children: ReactNode;
+  onClick: any;
+};
+
+export default function CollectionBar(props: Props) {
   return (
     <div className={styles.barWrapper} style={{ fill: props.fill }} {...props}>
       <div className={styles.bar} style={{ justifyContent: "initial" }}>

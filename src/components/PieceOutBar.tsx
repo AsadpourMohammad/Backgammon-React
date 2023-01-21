@@ -1,6 +1,14 @@
+import React, { ReactNode } from "react";
 import styles from "./PieceOutBar.module.css";
 
-export default function PieceOutBar(props) {
+type Props = {
+  fill: string;
+  isLeft: boolean;
+  children: ReactNode;
+  onClick: any;
+};
+
+export default function PieceOutBar(props: Props) {
   return (
     <div className={styles.barWrapper} style={{ fill: props.fill }} {...props}>
       <div

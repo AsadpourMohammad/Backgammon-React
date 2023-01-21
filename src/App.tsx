@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import "./App.css";
 import { backgammon, initialState, startingGame } from "./logic/start-game";
@@ -6,8 +6,6 @@ import { celebrateGameEnd } from "./logic/endgame";
 import { checkCantMove } from "./logic/calc-moves";
 import { rollingDice } from "./logic/roll-dice";
 import { changingTurn } from "./logic/logic";
-import BoardTop from "./components/BoardTop";
-import BoardBottom from "./components/BoardBottom";
 import {
   settingFromBar,
   settingFromEndBar,
@@ -15,6 +13,11 @@ import {
   settingToBar,
 } from "./logic/move";
 import Player from "./logic/player";
+import CollectionBar from "./components/components/CollectionBar";
+import Piece from "./components/components/Piece";
+import Board from "./components/components/Board";
+import Bar from "./components/components/Bar";
+import PieceOutBar from "./components/components/PieceOutBar";
 
 export const toastStyle = (turn: Player) => {
   return {
@@ -27,8 +30,6 @@ export const toastStyle = (turn: Player) => {
   };
 };
 
-export const BoardContext = createContext({});
-
 function App() {
   const [gameOn, setGameOn] = useState(false);
   const gameOver = useRef(false);
@@ -37,8 +38,12 @@ function App() {
   const [turn, setTurn] = useState<Player>({} as Player);
   const [opponent, setOpponent] = useState<Player>({} as Player);
 
-  const [whitePlayer, setWhitePlayer] = useState<Player>({} as Player);
-  const [blackPlayer, setBlackPlayer] = useState<Player>({} as Player);
+  const [whitePlayer, setWhitePlayer] = useState<Player>(
+    new Player("White", "WhiteOutBar", "WhiteEndBar")
+  );
+  const [blackPlayer, setBlackPlayer] = useState<Player>(
+    new Player("Black", "BlackOutBar", "BlackEndBar")
+  );
 
   const rolledDice = useRef<boolean>(false);
   const dices = useRef<number[]>([]);
@@ -172,7 +177,9 @@ function App() {
     }
 
     // Moving from 'from' to 'to
-    currBoard[toIdx as number].push(currBoard[fromIdx as number].pop() as string);
+    currBoard[toIdx as number].push(
+      currBoard[fromIdx as number].pop() as string
+    );
 
     setBoard(currBoard);
   }
@@ -253,7 +260,10 @@ function App() {
     }
 
     // Bar
-    if (fromBarIdx.current === -1 && board[index as number].includes(turn.player)) {
+    if (
+      fromBarIdx.current === -1 &&
+      board[index as number].includes(turn.player)
+    ) {
       [fromBarIdx.current, canGoToArray.current] = settingFromBar(
         index as number,
         board,
@@ -268,8 +278,8 @@ function App() {
       canGoToArray.current.includes(index as number)
     ) {
       [rolledDice.current, dices.current, maxMoves.current] = settingToBar(
+        index as number,
         fromBarIdx.current,
-        index,
         turn,
         dices.current,
         maxMoves.current,
@@ -287,28 +297,121 @@ function App() {
 
   return (
     <>
-      <BoardContext.Provider
-        value={{
-          select,
-          board,
-          canGoToArray: canGoTo,
-          whitePlayer,
-          blackPlayer,
-          fromBarIdx: fromBarIdx.current,
-        }}
-      >
-        <BoardTop />
-      </BoardContext.Provider>
+      <div className="board-top">
+        <CollectionBar
+          onClick={() => select(whitePlayer.endBarIdx)}
+          key={whitePlayer.endBarIdx}
+          fill={"#e0ded7"}
+        >
+          {whitePlayer.endBar.map((piece, pieceIdx) => (
+            <Piece
+              key={`${whitePlayer.endBarIdx}-${pieceIdx}`}
+              border={
+                piece !== "White" ? "1px solid #e9e2d6" : "1px solid black"
+              }
+              color={piece}
+            />
+          ))}
+        </CollectionBar>
 
-      <BoardBottom
-        select={select}
-        gameOn={gameOn}
-        startGame={startGame}
-        rollDice={rollDice}
-        whitePlayer={whitePlayer}
-        blackPlayer={blackPlayer}
-        fromBarIdx={fromBarIdx.current}
-      />
+        <Board>
+          {board.map((bar, barIdx) => (
+            <Bar
+              isTopRow={barIdx > 11}
+              onClick={() => select(barIdx)}
+              key={barIdx}
+              fill={
+                (canGoTo.includes(barIdx) && "#671010") ||
+                (barIdx % 2 === 0 && barIdx > 11 && "#232937") ||
+                (barIdx % 2 !== 0 && barIdx <= 11 && "#232937") ||
+                (barIdx % 2 === 0 && barIdx <= 11 && "#e0ded7") ||
+                (barIdx % 2 !== 0 && barIdx > 11 && "#e0ded7") ||
+                "red"
+              }
+            >
+              {bar.map((piece, pieceIdx) => (
+                <Piece
+                  key={`${barIdx}-${pieceIdx}`}
+                  border={
+                    (fromBarIdx.current === barIdx &&
+                      ((pieceIdx === 0 && barIdx > 11) ||
+                        (pieceIdx === bar.length - 1 && barIdx <= 11)) &&
+                      "2px solid #671010") ||
+                    (piece !== "White"
+                      ? "1px solid #e9e2d6"
+                      : "1px solid black")
+                  }
+                  color={piece}
+                />
+              ))}
+            </Bar>
+          ))}
+        </Board>
+
+        <CollectionBar
+          onClick={() => select(blackPlayer.endBarIdx)}
+          key={blackPlayer.endBarIdx}
+          fill={"#232937"}
+        >
+          {blackPlayer.endBar.map((piece, pieceIdx) => (
+            <Piece
+              key={`${blackPlayer.endBarIdx}-${pieceIdx}`}
+              border={
+                piece !== "White" ? "1px solid #e9e2d6" : "1px solid black"
+              }
+              color={piece}
+            />
+          ))}
+        </CollectionBar>
+      </div>
+
+      <div className="board-bottom">
+        <PieceOutBar
+          isLeft={true}
+          onClick={() => select(whitePlayer.outBarIdx)}
+          key={whitePlayer.outBarIdx}
+          fill={"#e0ded7"}
+        >
+          {whitePlayer.outBar.map((piece, pieceIdx) => (
+            <Piece
+              key={`${whitePlayer.outBarIdx}-${pieceIdx}`}
+              border={
+                (fromBarIdx.current === whitePlayer.outBarIdx &&
+                  pieceIdx === whitePlayer.outBar.length - 1 &&
+                  "3px solid #671010") ||
+                "1px solid white"
+              }
+              color={piece}
+            />
+          ))}
+        </PieceOutBar>
+
+        {gameOn ? (
+          <button onClick={rollDice}>🎲 roll Dice 🎲</button>
+        ) : (
+          <button onClick={startGame}>⚪ Begin Game ⚫</button>
+        )}
+
+        <PieceOutBar
+          isLeft={false}
+          onClick={() => select(blackPlayer.outBarIdx)}
+          key={blackPlayer.outBarIdx}
+          fill={"#232937"}
+        >
+          {whitePlayer.outBar.map((piece, pieceIdx) => (
+            <Piece
+              key={`${whitePlayer.outBarIdx}-${pieceIdx}`}
+              border={
+                (fromBarIdx.current === blackPlayer.outBarIdx &&
+                  pieceIdx === 0 &&
+                  "3px solid #671010") ||
+                "1px solid black"
+              }
+              color={piece}
+            />
+          ))}
+        </PieceOutBar>
+      </div>
     </>
   );
 }

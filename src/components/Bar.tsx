@@ -1,6 +1,14 @@
+import { ReactNode } from "react";
 import styles from "./Bar.module.css";
 
-export default function Bar(props) {
+type Props = {
+  fill: string;
+  isTopRow: boolean;
+  children: ReactNode;
+  onClick: any;
+};
+
+export default function Bar(props: Props) {
   return (
     <div className={styles.barWrapper} style={{ fill: props.fill }} {...props}>
       <div

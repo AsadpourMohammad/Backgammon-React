@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import Game from "../backend/models/game";
 import Player from "../backend/models/player";
 import ThisMove from "../backend/models/this-move";
@@ -66,23 +67,27 @@ export default function BoardTop(props: BoardProps) {
           "Red"
         }
       >
-        {props.bar.map((piece, pieceIdx) => (
-          <CreatePiece
-            piece={piece}
-            pieceIdx={pieceIdx}
-            key={`${props.barIdx}-${pieceIdx}-temp`}
-            border={
-              (props.thisMove.fromBarIdx === props.barIdx &&
-                ((pieceIdx === 0 && props.barIdx > 11) ||
-                  (pieceIdx === props.bar.length - 1 && props.barIdx <= 11)) &&
-                "2px solid #671010") ||
-              (piece == "White"
-                ? props.game.whitePlayer.pieceBorderColor
-                : props.game.blackPlayer.pieceBorderColor)
-            }
-            {...props}
-          />
-        ))}
+        {props.bar.map(
+          (piece, pieceIdx) =>
+            pieceIdx < 6 && (
+              <CreatePiece
+                piece={piece}
+                pieceIdx={pieceIdx}
+                key={`${props.barIdx}-${pieceIdx}-temp`}
+                border={
+                  (props.thisMove.fromBarIdx === props.barIdx &&
+                    ((pieceIdx === 0 && props.barIdx > 11) ||
+                      (pieceIdx === props.bar.length - 1 &&
+                        props.barIdx <= 11)) &&
+                    "2px solid #671010") ||
+                  (piece == "White"
+                    ? props.game.whitePlayer.pieceBorderColor
+                    : props.game.blackPlayer.pieceBorderColor)
+                }
+                {...props}
+              />
+            )
+        )}
       </Bar>
     );
   }
@@ -101,10 +106,11 @@ export default function BoardTop(props: BoardProps) {
         {props.player.endBar.map((piece, pieceIdx) => (
           <CreatePiece
             key={`${props.player.endBarIdx}-${pieceIdx}-temp`}
+            bar={props.player.endBar}
+            barIdx={props.player.endBarIdx}
             piece={piece}
             pieceIdx={pieceIdx}
             border={props.player.pieceBorderColor}
-            barIdx={props.player.endBarIdx}
           />
         ))}
       </EndBar>
@@ -112,6 +118,7 @@ export default function BoardTop(props: BoardProps) {
   }
 
   interface PieceProps {
+    bar: string[];
     barIdx: number | string;
     piece: string;
     pieceIdx: number;
@@ -124,7 +131,13 @@ export default function BoardTop(props: BoardProps) {
         key={`${props.barIdx}-${props.pieceIdx}`}
         border={props.border}
         color={props.piece}
-      />
+      >
+        {(props.bar.length > 6 && 
+        ((props.pieceIdx === 0 && props.barIdx > 11) ||
+          (props.pieceIdx === 5 && props.barIdx <= 11))) && (
+            <>{props.bar.length - 6}</>
+          )}
+      </Piece>
     );
   }
 }

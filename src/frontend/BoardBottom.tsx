@@ -55,19 +55,22 @@ export default function BoardBottom(props: BoardProps) {
         key={props.player.outBarIdx}
         fill={props.fill}
       >
-        {props.player.outBar.map((piece, pieceIdx) => (
-          <CreatePiece
-            key={`${props.player.outBarIdx}-${pieceIdx}-temp`}
-            piece={piece}
-            pieceIdx={pieceIdx}
-            selectedPiece={
-              props.player.name === "White"
-                ? pieceIdx === props.player.outBar.length - 1
-                : pieceIdx === 0
-            }
-            {...props}
-          />
-        ))}
+        {props.player.outBar.map(
+          (piece, pieceIdx) =>
+            pieceIdx < 6 && (
+              <CreatePiece
+                key={`${props.player.outBarIdx}-${pieceIdx}-temp`}
+                piece={piece}
+                pieceIdx={pieceIdx}
+                selectedPiece={
+                  props.player.name === "White"
+                    ? pieceIdx === props.player.outBar.length - 1
+                    : pieceIdx === 0
+                }
+                {...props}
+              />
+            )
+        )}
       </OutBar>
     );
   }
@@ -90,7 +93,13 @@ export default function BoardBottom(props: BoardProps) {
           props.player.pieceBorderColor
         }
         color={props.piece}
-      />
+      >
+        {props.player.outBar.length > 6 &&
+          ((props.pieceIdx === 5 && props.player.name === "White") ||
+            (props.pieceIdx === 0 && props.player.name === "Black")) && (
+            <>{props.player.outBar.length - 6}</>
+          )}
+      </Piece>
     );
   }
 }

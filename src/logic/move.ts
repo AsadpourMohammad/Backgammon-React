@@ -1,16 +1,17 @@
 import { calcGettingOutOfOutMoves, calcPossibleMoves } from "./calc-moves";
 import { calcEndingDiceBars, readyToEnd } from "./endgame";
+import Game from "./game";
 import { calcMovesMade } from "./logic";
 import Player from "./player";
 
 export function settingFromBar(
+  game: Game,
   index: number,
-  board: string[][],
   turn: Player,
   opponent: Player,
   dices: number[]
 ): [number, number[]] {
-  const canGoTo = calcPossibleMoves(index, board, turn, opponent, dices);
+  const canGoTo = calcPossibleMoves(game, index, turn, opponent, dices);
 
   if (canGoTo.length !== 0) {
     var fromBarIdx = index;
@@ -22,28 +23,28 @@ export function settingFromBar(
 }
 
 export function settingFromOutBar(
+  game: Game,
   index: string,
-  board: string[][],
   turn: Player,
   opponent: Player,
   dices: number[]
 ): [string, number[]] {
   var fromBarIdx = index;
 
-  const canGoTo = calcGettingOutOfOutMoves(board, turn, opponent, dices);
+  const canGoTo = calcGettingOutOfOutMoves(game, turn, opponent, dices);
 
   return [fromBarIdx, canGoTo];
 }
 
 export function settingFromEndBar(
+  game: Game,
   index: string,
   fromBarIdx: number | string,
   dices: number[],
-  board: string[][],
   turn: Player
 ): [number | string, number[]] {
-  if (readyToEnd(board, turn)) {
-    const endingDiceBars = calcEndingDiceBars(board, turn, dices);
+  if (readyToEnd(game, turn)) {
+    const endingDiceBars = calcEndingDiceBars(game, turn, dices);
 
     if (endingDiceBars.length !== 0) {
       fromBarIdx = index;
@@ -55,6 +56,7 @@ export function settingFromEndBar(
 }
 
 export function settingToBar(
+  game: Game,
   index: number,
   fromBarIdx: number | string,
   turn: Player,
@@ -69,6 +71,7 @@ export function settingToBar(
   checkState(fromBarIdx, toBarIdx);
 
   [rolledDice, dices, maxMoves] = calcMovesMade(
+    game,
     fromBarIdx,
     toBarIdx,
     turn,

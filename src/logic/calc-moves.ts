@@ -1,11 +1,12 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
 import { calcEndingDiceBars } from "./endgame";
+import Game from "./game";
 import Player from "./player";
 
 export function calcPossibleMoves(
+  game: Game,
   fromBarIdx: number,
-  board: string[][],
   turn: Player,
   opponent: Player,
   dices: number[]
@@ -17,8 +18,8 @@ export function calcPossibleMoves(
 
   const canGoTo: number[] = [];
 
-  for (let i = 0; i < board.length; i++) {
-    var toBar = board[i];
+  for (let i = 0; i < game.board.length; i++) {
+    var toBar = game.board[i];
     var toBarIdx = i;
 
     if (toBar.includes(opponent.player) && toBar.length > 1) {
@@ -67,7 +68,7 @@ export function calcPossibleMoves(
 }
 
 export function calcGettingOutOfOutMoves(
-  board: string[][],
+  game: Game,
   turn: Player,
   opponent: Player,
   dices: number[]
@@ -78,34 +79,34 @@ export function calcGettingOutOfOutMoves(
   if (turn.player === "White") {
     if (
       firstDice > 0 &&
-      (!board[12 - firstDice].includes(opponent.player) ||
-        (board[12 - firstDice].includes(opponent.player) &&
-          board[12 - firstDice].length === 1))
+      (!game.board[12 - firstDice].includes(opponent.player) ||
+        (game.board[12 - firstDice].includes(opponent.player) &&
+          game.board[12 - firstDice].length === 1))
     ) {
       canGoTo.push(12 - firstDice);
     }
     if (
       secondDice > 0 &&
-      (!board[12 - secondDice].includes(opponent.player) ||
-        (board[12 - secondDice].includes(opponent.player) &&
-          board[12 - secondDice].length === 1))
+      (!game.board[12 - secondDice].includes(opponent.player) ||
+        (game.board[12 - secondDice].includes(opponent.player) &&
+          game.board[12 - secondDice].length === 1))
     ) {
       canGoTo.push(12 - secondDice);
     }
   } else {
     if (
       firstDice > 0 &&
-      (!board[24 - firstDice].includes(opponent.player) ||
-        (board[24 - firstDice].includes(opponent.player) &&
-          board[24 - firstDice].length === 1))
+      (!game.board[24 - firstDice].includes(opponent.player) ||
+        (game.board[24 - firstDice].includes(opponent.player) &&
+          game.board[24 - firstDice].length === 1))
     ) {
       canGoTo.push(24 - firstDice);
     }
     if (
       secondDice > 0 &&
-      (!board[24 - secondDice].includes(opponent.player) ||
-        (board[24 - secondDice].includes(opponent.player) &&
-          board[24 - secondDice].length === 1))
+      (!game.board[24 - secondDice].includes(opponent.player) ||
+        (game.board[24 - secondDice].includes(opponent.player) &&
+          game.board[24 - secondDice].length === 1))
     ) {
       canGoTo.push(24 - secondDice);
     }
@@ -115,57 +116,53 @@ export function calcGettingOutOfOutMoves(
 }
 
 export function hasPossibleMove(
+  game: Game,
   turn: Player,
   opponent: Player,
-  board: string[][],
-  dices: number[],
-  whitePlayer: Player,
-  blackPlayer: Player
+  dices: number[]
 ): boolean {
   const outPieces =
-    turn === whitePlayer ? [...whitePlayer.outBar] : [...blackPlayer.outBar];
+    turn === game.whitePlayer
+      ? [...game.whitePlayer.outBar]
+      : [...game.blackPlayer.outBar];
   if (outPieces.length !== 0) {
-    const canGoTo = calcGettingOutOfOutMoves(board, turn, opponent, dices);
+    const canGoTo = calcGettingOutOfOutMoves(game, turn, opponent, dices);
     return canGoTo.length !== 0;
   }
 
   const containing: number[] = [];
-  board.map((bar, barIdx) => {
+  game.board.map((bar, barIdx) => {
     if (bar.includes(turn.player)) containing.push(barIdx);
   });
 
   const allMoves: number[] = [];
   containing.map((barIdx) => {
-    const canGoTo = calcPossibleMoves(barIdx, board, turn, opponent, dices);
+    const canGoTo = calcPossibleMoves(game, barIdx, turn, opponent, dices);
 
     canGoTo.map((barIdx) => allMoves.push(barIdx));
   });
 
-  const endingDiceBars = calcEndingDiceBars(board, turn, dices);
+  const endingDiceBars = calcEndingDiceBars(game, turn, dices);
   endingDiceBars.map((barIdx) => allMoves.push(barIdx));
 
   return allMoves.length !== 0;
 }
 
 export function checkCantMove(
-  board: string[][],
-  dices: number[],
+  game: Game,
   turn: Player,
   opponent: Player,
-  whitePlayer: Player,
-  blackPlayer: Player,
+  dices: number[],
   changeTurn: Function,
   setToDefault: Function
 ): boolean {
-  if (
-    !hasPossibleMove(turn, opponent, board, dices, whitePlayer, blackPlayer)
-  ) {
+  if (game.gameOn && !hasPossibleMove(game, turn, opponent, dices)) {
     toast.error(
       "You have no possible moves.\nTurn changes to opponent.",
       toastStyle(turn)
     );
 
-    changeTurn();
+    changeTurn(game);
     setToDefault();
 
     return true;

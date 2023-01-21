@@ -1,11 +1,12 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
+import Game from "./game";
 import Player from "./player";
 
-export function readyToEnd(board: string[][], turn: Player): boolean {
+export function readyToEnd(game: Game, turn: Player): boolean {
   const containing: number[] = [];
 
-  board.map((bar, barIdx) => {
+  game.board.map((bar, barIdx) => {
     if (bar.includes(turn.player)) containing.push(barIdx);
   });
 
@@ -27,7 +28,7 @@ export function readyToEnd(board: string[][], turn: Player): boolean {
 }
 
 export function calcEndingDiceBars(
-  board: string[][],
+  game: Game,
   turn: Player,
   dices: number[]
 ): number[] {
@@ -35,26 +36,26 @@ export function calcEndingDiceBars(
   const [firstDice, secondDice] = dices;
 
   if (turn.player === "White") {
-    if (firstDice > 0 && board[24 - firstDice].includes(turn.player)) {
+    if (firstDice > 0 && game.board[24 - firstDice].includes(turn.player)) {
       canGoFrom.push(24 - firstDice);
     }
 
     if (
       secondDice > 0 &&
       firstDice !== secondDice &&
-      board[24 - secondDice].includes(turn.player)
+      game.board[24 - secondDice].includes(turn.player)
     ) {
       canGoFrom.push(24 - secondDice);
     }
   } else {
-    if (firstDice > 0 && board[12 - firstDice].includes(turn.player)) {
+    if (firstDice > 0 && game.board[12 - firstDice].includes(turn.player)) {
       canGoFrom.push(12 - firstDice);
     }
 
     if (
       secondDice > 0 &&
       firstDice !== secondDice &&
-      board[12 - secondDice].includes(turn.player)
+      game.board[12 - secondDice].includes(turn.player)
     ) {
       canGoFrom.push(12 - secondDice);
     }

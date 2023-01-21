@@ -1,15 +1,22 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
+import Game from "./game";
 import Player from "./player";
 
 export function changingTurn(
+  game: Game,
   turn: Player,
-  opponent: Player,
-  whitePlayer: Player,
-  blackPlayer: Player
+  opponent: Player
 ): [Player, Player] {
-  turn = turn.player === blackPlayer.player ? whitePlayer : blackPlayer;
-  opponent = opponent.player === whitePlayer.player ? blackPlayer : whitePlayer;
+  turn =
+    turn.player === game.blackPlayer.player
+      ? game.whitePlayer
+      : game.blackPlayer;
+      
+  opponent =
+    opponent.player === game.whitePlayer.player
+      ? game.blackPlayer
+      : game.whitePlayer;
 
   toast.success("Turn is now: " + turn.player, toastStyle(turn));
 
@@ -17,6 +24,7 @@ export function changingTurn(
 }
 
 export function calcMovesMade(
+  game:Game,
   fromBarIdx: number | string,
   toBarIdx: number,
   turn: Player,
@@ -51,7 +59,7 @@ export function calcMovesMade(
   var moves = distance;
 
   if (moves === maxMoves) {
-    changeTurn();
+    changeTurn(game);
     return [false, [], 0];
   } else if (moves === dices[0]) {
     maxMoves -= dices.shift() as number;

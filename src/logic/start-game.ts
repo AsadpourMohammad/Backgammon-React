@@ -1,36 +1,9 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
+import Game from "./game";
 import Player from "./player";
 import { dice } from "./roll-dice";
 
-export const initialState = () => {
-  return [
-    ["White", "White", "White", "White", "White"],
-    [],
-    [],
-    [],
-    ["Black", "Black", "Black"],
-    [],
-    ["Black", "Black", "Black", "Black", "Black"],
-    [],
-    [],
-    [],
-    [],
-    ["White", "White"],
-    ["Black", "Black", "Black", "Black", "Black"],
-    [],
-    [],
-    [],
-    ["White", "White", "White"],
-    [],
-    ["White", "White", "White", "White", "White"],
-    [],
-    [],
-    [],
-    [],
-    ["Black", "Black"],
-  ];
-};
 
 export function backgammon() {
   toast(
@@ -62,10 +35,7 @@ export function backgammon() {
   );
 }
 
-export function startingGame(
-  whitePlayer: Player,
-  blackPlayer: Player
-): [Player, Player] {
+export function startingGame(game: Game): [Player, Player] {  
   var turn: Player;
   var opponent: Player;
 
@@ -74,14 +44,14 @@ export function startingGame(
     const [blackFirst, blackSecond] = dice();
 
     if (whiteFirst + whiteSecond > blackFirst + blackSecond) {
-      turn = whitePlayer;
-      opponent = blackPlayer;
+      turn = game.whitePlayer;
+      opponent = game.blackPlayer;
       toast.success("The Game starts with ⚪ WHITE ⚪", toastStyle(turn));
 
       break;
     } else if (whiteFirst + whiteSecond < blackFirst + blackSecond) {
-      turn = blackPlayer;
-      opponent = whitePlayer;
+      turn = game.blackPlayer;
+      opponent = game.whitePlayer;
       toast.success("The Game starts with ⚫ BLACK ⚫", toastStyle(turn));
 
       break;

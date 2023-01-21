@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import styles from "./CollectionBar.module.css";
+import styles from "./EndBar.module.css";
 
 type Props = {
   fill: string;
@@ -7,7 +7,7 @@ type Props = {
   onClick: any;
 };
 
-export default function CollectionBar(props: Props) {
+export default function EndBar(props: Props) {
   return (
     <div className={styles.barWrapper} style={{ fill: props.fill }} {...props}>
       <div className={styles.bar} style={{ justifyContent: "initial" }}>

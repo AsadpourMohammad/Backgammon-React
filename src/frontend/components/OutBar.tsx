@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import styles from "./PieceOutBar.module.css";
+import { ReactNode } from "react";
+import styles from "./OutBar.module.css";
 
 type Props = {
   fill: string;
@@ -8,7 +8,7 @@ type Props = {
   onClick: any;
 };
 
-export default function PieceOutBar(props: Props) {
+export default function OutBar(props: Props) {
   return (
     <div className={styles.barWrapper} style={{ fill: props.fill }} {...props}>
       <div

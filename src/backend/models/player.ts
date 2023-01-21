@@ -5,7 +5,9 @@ export default class Player {
   constructor(
     private readonly _player: string,
     private readonly _outBarIdx: string,
-    private readonly _endBarIdx: string
+    private readonly _endBarIdx: string,
+    private readonly _pieceColor: string, 
+    private readonly _pieceBorderColor: string
   ) {
     this._outBar = [];
     this._endBar = [];
@@ -37,11 +39,21 @@ export default class Player {
     return this._endBarIdx;
   }
 
+  public get pieceColor(): string {
+    return this._pieceColor;
+  }
+
+  public get pieceBorderColor(): string {
+    return this._pieceBorderColor;
+  }
+
   public clone() {
     const newPlayer = new Player(
       this._player,
       this._outBarIdx,
-      this._endBarIdx
+      this._endBarIdx,
+      this._pieceColor, 
+      this._pieceBorderColor
     );
 
     newPlayer.outBar = [...this.outBar];

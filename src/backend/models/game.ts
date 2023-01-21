@@ -9,8 +9,20 @@ export default class Game {
   constructor() {
     this._gameOn = false;
     this._board = this.initialState();
-    this._whitePlayer = this.newPlayer("White", "WhiteOutBar", "WhiteEndBar");
-    this._blackPlayer = this.newPlayer("Black", "BlackOutBar", "BlackEndBar");
+    this._whitePlayer = this.newPlayer(
+      "White",
+      "WhiteOutBar",
+      "WhiteEndBar",
+      "White",
+      "1px solid black"
+    );
+    this._blackPlayer = this.newPlayer(
+      "Black",
+      "BlackOutBar",
+      "BlackEndBar",
+      "Black",
+      "1px solid #e9e2d6"
+    );
   }
 
   initialState = () => [
@@ -40,8 +52,13 @@ export default class Game {
     ["Black", "Black"],
   ];
 
-  newPlayer = (player: string, outBarIdx: string, endBarIdx: string) =>
-    new Player(player, outBarIdx, endBarIdx);
+  newPlayer = (
+    player: string,
+    outBarIdx: string,
+    endBarIdx: string,
+    pieceColor: string,
+    pieceBorderColor: string
+  ) => new Player(player, outBarIdx, endBarIdx, pieceColor, pieceBorderColor);
 
   public get gameOn(): boolean {
     return this._gameOn;

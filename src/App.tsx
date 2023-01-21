@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import "./App.css";
-import { checkCantMove } from "./backend/calculations/calc-possible-moves";
-import BoardTop from "./frontend/BoardTop";
-import ThisTurn from "./backend/models/this-turn";
-import Game from "./backend/models/game";
-import ThisMove from "./backend/models/this-move";
 import { backgammon, startingGame } from "./backend/events/start-game";
 import { rollingDice } from "./backend/events/roll-dice";
 import { selecting } from "./backend/events/select";
 import BoardBottom from "./frontend/BoardBottom";
+import ThisTurn from "./backend/models/this-turn";
+import Game from "./backend/models/game";
+import ThisMove from "./backend/models/this-move";
+import BoardTop from "./frontend/BoardTop";
+import { checkCantMove } from "./backend/calculations/calc-possible-moves";
 
 export const toastStyle = (thisTurn: ThisTurn) => {
   return {
@@ -47,8 +47,8 @@ function App() {
   function rollDice() {
     if (thisTurn.rolledDice) {
       toast.error(
-        "Play your move before rolling again.\n" +
-          `🎲 ${thisTurn.turnPlayer.name}: ${thisTurn.dices} 🎲`,
+        "Play your move first.\n" +
+          `${thisTurn.turnPlayer.icon} 🎲 ${thisTurn.dices} 🎲`,
         toastStyle(thisTurn)
       );
 

@@ -8,9 +8,9 @@ export function backgammon() {
   toast(
     `Backgammon...
   
-  Is the oldest game in the world. Archaeologists found sets when 
-  they excavated the ruins of 
-  ancient Mesopotamia,
+  Is the oldest game in the world. Archaeologists found sets
+  when they excavated the ruins
+  of ancient Mesopotamia,
   five thousand years old. 
 
   That's older than Jesus Christ. 
@@ -43,12 +43,12 @@ export function startingGame(game: Game): ThisTurn {
 
     if (whiteFirst + whiteSecond > blackFirst + blackSecond) {
       thisTurn = new ThisTurn(game.whitePlayer, game.blackPlayer, [], false);
-      toast.success("The Game starts with ⚪ WHITE ⚪", toastStyle(thisTurn));
+      toast.success("Game starts with ⚪ WHITE ⚪", toastStyle(thisTurn));
 
       break;
     } else if (whiteFirst + whiteSecond < blackFirst + blackSecond) {
       thisTurn = new ThisTurn(game.blackPlayer, game.whitePlayer, [], false);
-      toast.success("The Game starts with ⚫ BLACK ⚫", toastStyle(thisTurn));
+      toast.success("Game starts with ⚫ BLACK ⚫", toastStyle(thisTurn));
 
       break;
     }

@@ -19,12 +19,14 @@ export function rollingDice(tempTurn: ThisTurn) {
 
   if (thisTurn.dices[0] === thisTurn.dices[1]) {
     toast.success(
-      `🎲 ${thisTurn.turnPlayer.name}: Rolled a Double: ${thisTurn.dices} 🎲`,
+      `${thisTurn.turnPlayer.icon}
+      🎲 Rolled a double ${thisTurn.dices} 🎲`,
       toastStyle(thisTurn)
     );
   } else {
     toast.success(
-      `🎲 ${thisTurn.turnPlayer.name}: ${thisTurn.dices} 🎲`,
+      `${thisTurn.turnPlayer.icon}
+      🎲 Rolled ${thisTurn.dices} 🎲`,
       toastStyle(thisTurn)
     );
   }

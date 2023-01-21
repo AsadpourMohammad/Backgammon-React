@@ -1,12 +1,7 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../../App";
 import { calcMovesMade } from "../calculations/calc-moves-made";
-import {
-  calcEndingDiceBars,
-  calcGettingOutOfOutMoves,
-  calcPossibleMoves,
-  checkCantMove,
-} from "../calculations/calc-possible-moves";
+import { calcEndingDiceBars, calcGettingOutOfOutMoves, calcPossibleMoves, checkCantMove } from "../calculations/calc-possible-moves";
 import Game from "../models/game";
 import ThisMove from "../models/this-move";
 import ThisTurn from "../models/this-turn";
@@ -45,8 +40,8 @@ export function selecting(
     index === thisTurn.turnPlayer.endBarIdx
   ) {
     toast.error(
-      `You have not brought all your pieces 
-      to the ending area yet.`,
+      `You have not brought all your
+      pieces to the ending area yet.`,
       toastStyle(thisTurn)
     );
     return [game, thisTurn, thisMove];
@@ -66,7 +61,7 @@ export function selecting(
     game.board[index].includes(thisTurn.opponentPlayer.name) &&
     game.board[index].length > 1
   ) {
-    toast.error("You can't select an opponent's bar.", toastStyle(thisTurn));
+    toast.error("You can't select opponent's bar.", toastStyle(thisTurn));
     return [game, thisTurn, thisMove];
   }
 
@@ -75,7 +70,11 @@ export function selecting(
     thisMove.fromBarIdx !== thisTurn.turnPlayer.outBarIdx &&
     index !== thisTurn.turnPlayer.outBarIdx
   ) {
-    toast.error("You have to play you out pieces first.", toastStyle(thisTurn));
+    toast.error(
+      `You have to play 
+      your out pieces first.`,
+      toastStyle(thisTurn)
+    );
     return [game, thisTurn, thisMove];
   }
 
@@ -124,8 +123,10 @@ export function selecting(
     if (!thisTurn.turnPlayer.inTheEnd && readyToEnd(game, thisTurn)) {
       thisTurn.turnPlayer.inTheEnd = true;
 
-      toast.success(`${thisTurn.turnPlayer.icon} is in the ending area!
-      Select the ending bar & put pieces out.`),
+      toast.success(`${thisTurn.turnPlayer.icon} 
+      is in the ending area!
+      Select your ending bar
+      & start putting pieces out.`),
         toastStyle(thisTurn);
     }
 
@@ -143,7 +144,9 @@ export function selecting(
     return [game, thisTurn, thisMove];
   }
 
-  console.log("Why are you here?", thisTurn);
+  toast("Why are you here?", toastStyle(thisTurn));
+  console.log(thisTurn);
+
   return [game, thisTurn, thisMove];
 }
 

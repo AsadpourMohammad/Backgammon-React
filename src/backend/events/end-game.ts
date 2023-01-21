@@ -7,10 +7,10 @@ export function readyToEnd(game: Game, thisTurn: ThisTurn): boolean {
   const containing: number[] = [];
 
   game.board.map((bar, barIdx) => {
-    if (bar.includes(thisTurn.turnPlayer.player)) containing.push(barIdx);
+    if (bar.includes(thisTurn.turnPlayer.name)) containing.push(barIdx);
   });
 
-  if (thisTurn.turnPlayer.player === "White") {
+  if (thisTurn.turnPlayer.name === "White") {
     for (let i = 0; i < containing.length; i++) {
       const barIdx = containing[i];
 
@@ -28,10 +28,5 @@ export function readyToEnd(game: Game, thisTurn: ThisTurn): boolean {
 }
 
 export function celebrateGameEnd(thisTurn: ThisTurn): void {
-  toast(
-    thisTurn.turnPlayer.player === "White"
-      ? `⚪ WHITE ⚪ has Won the Game!`
-      : `⚫ BLACK ⚫ has Won the Game!`,
-    toastStyle(thisTurn)
-  );
+  toast(`${thisTurn.turnPlayer.icon} has Won the Game!`, toastStyle(thisTurn));
 }

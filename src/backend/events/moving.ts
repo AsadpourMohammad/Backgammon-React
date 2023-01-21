@@ -11,14 +11,14 @@ export function movingPiece(
   const [fromBarIdx, toBarIdx] = [thisMove.fromBarIdx, thisMove.toBarIdx];
 
   // Throwing opponent piece out
-  if (game.board[toBarIdx as number].includes(thisTurn.opponentPlayer.player)) {
+  if (game.board[toBarIdx as number].includes(thisTurn.opponentPlayer.name)) {
     thisTurn.opponentPlayer.outBar.push(
       game.board[toBarIdx as number].pop() as string
     );
 
     thisTurn.opponentPlayer.inTheEnd = false;
 
-    thisTurn.opponentPlayer.player === game.whitePlayer.player
+    thisTurn.opponentPlayer.name === game.whitePlayer.name
       ? (game.whitePlayer = thisTurn.opponentPlayer)
       : (game.blackPlayer = thisTurn.opponentPlayer);
   }
@@ -29,7 +29,7 @@ export function movingPiece(
       thisTurn.turnPlayer.outBar.pop() as string
     );
 
-    thisTurn.turnPlayer.player === game.whitePlayer.player
+    thisTurn.turnPlayer.name === game.whitePlayer.name
       ? (game.whitePlayer = thisTurn.turnPlayer)
       : (game.blackPlayer = thisTurn.turnPlayer);
 
@@ -42,7 +42,7 @@ export function movingPiece(
       game.board[toBarIdx as number].pop() as string
     );
 
-    thisTurn.turnPlayer.player === game.whitePlayer.player
+    thisTurn.turnPlayer.name === game.whitePlayer.name
       ? (game.whitePlayer = thisTurn.turnPlayer)
       : (game.blackPlayer = thisTurn.turnPlayer);
 

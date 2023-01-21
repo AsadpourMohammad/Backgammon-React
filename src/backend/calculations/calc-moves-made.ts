@@ -23,12 +23,12 @@ export function calcMovesMade(
   } else {
     if (fromBarIdx === thisTurn.turnPlayer.outBarIdx) {
       distance =
-        thisTurn.turnPlayer.player === "White" ? 12 - toBarIdx : 24 - toBarIdx;
+        thisTurn.turnPlayer.name === "White" ? 12 - toBarIdx : 24 - toBarIdx;
     }
 
     if (fromBarIdx === thisTurn.turnPlayer.endBarIdx) {
       var distance =
-        thisTurn.turnPlayer.player === "White" ? 24 - toBarIdx : 12 - toBarIdx;
+        thisTurn.turnPlayer.name === "White" ? 24 - toBarIdx : 12 - toBarIdx;
     }
   }
 
@@ -37,11 +37,12 @@ export function calcMovesMade(
   if (
     thisTurn.movesMade === thisTurn.dices[0] ||
     (thisTurn.turnPlayer.inTheEnd && distance <= thisTurn.dices[0])
-  ) {
+  ) {    
     thisTurn.maxMoves -= thisTurn.dices.shift() as number;
-  } else if (thisTurn.movesMade === thisTurn.dices[1]) {
+  } else if (thisTurn.movesMade === thisTurn.dices[1] ||
+    (thisTurn.turnPlayer.inTheEnd && distance <= thisTurn.dices[1])) {    
     thisTurn.maxMoves -= thisTurn.dices.pop() as number;
   }
-
+  
   return thisTurn;
 }

@@ -1,21 +1,22 @@
 import Player from "./player";
 
 export default class ThisTurn {
-  private _rolledDice: boolean;
-  private _maxMoves: number;
-  private _movesMade: number;
+  private _rolledDice: boolean = false;
+  private _maxMoves: number = 0;
+  private _movesMade: number = 0;
 
   constructor(
     private readonly _turnPlayer: Player,
     private readonly _opponentPlayer: Player,
-    private _dices: number[]
+    private _dices: number[],
+    private _beginning: boolean
   ) {
-    if (this._dices.length !== 0) {
-      if (this.dices[0] === this.dices[1]) {
+    if (_beginning && _dices.length === 2) {
+      if (this._maxMoves === 0 && this.dices[0] === this.dices[1]) {
         this.dices.push(this.dices[0]);
         this.dices.push(this.dices[0]);
       }
-
+      this._beginning = false;
       this._rolledDice = true;
       this._maxMoves = this._dices.reduce((a, b) => a + b, 0);
       this._movesMade = 0;
@@ -26,7 +27,7 @@ export default class ThisTurn {
     }
   }
 
-  public static new = () => new ThisTurn(Player.new(), Player.new(), []);
+  public static new = () => new ThisTurn(Player.new(), Player.new(), [], false);
 
   public get turnPlayer(): Player {
     return this._turnPlayer;
@@ -68,7 +69,8 @@ export default class ThisTurn {
     const newThisTurn = new ThisTurn(
       this._turnPlayer,
       this._opponentPlayer,
-      this._dices
+      this._dices,
+      false
     );
 
     newThisTurn.rolledDice = this._rolledDice;

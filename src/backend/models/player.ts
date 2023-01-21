@@ -4,7 +4,8 @@ export default class Player {
   private _inTheEnd: boolean;
 
   constructor(
-    private readonly _player: string,
+    private readonly _name: string,
+    private readonly _icon: string,
     private readonly _outBarIdx: string,
     private readonly _endBarIdx: string,
     private readonly _pieceColor: string,
@@ -15,10 +16,14 @@ export default class Player {
     this._inTheEnd = false;
   }
 
-  public static new = () => new Player("", "", "", "", "");
+  public static new = () => new Player("", "", "", "", "", "");
 
-  public get player(): string {
-    return this._player;
+  public get name(): string {
+    return this._name;
+  }
+
+  public get icon(): string {
+    return this._icon;
   }
 
   public get outBar(): string[] {
@@ -60,7 +65,8 @@ export default class Player {
 
   public clone() {
     const newPlayer = new Player(
-      this._player,
+      this._name,
+      this._icon,
       this._outBarIdx,
       this._endBarIdx,
       this._pieceColor,

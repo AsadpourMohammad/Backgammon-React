@@ -26,7 +26,7 @@ export function hasPossibleMove(game: Game, thisTurn: ThisTurn): boolean {
 
   const containing: number[] = [];
   game.board.map((bar, barIdx) => {
-    if (bar.includes(thisTurn.turnPlayer.player)) containing.push(barIdx);
+    if (bar.includes(thisTurn.turnPlayer.name)) containing.push(barIdx);
   });
 
   const allMoves: number[] = [];
@@ -58,11 +58,11 @@ export function calcPossibleMoves(
     var toBar = game.board[i];
     var toBarIdx = i;
 
-    if (toBar.includes(thisTurn.opponentPlayer.player) && toBar.length > 1) {
+    if (toBar.includes(thisTurn.opponentPlayer.name) && toBar.length > 1) {
       continue;
     }
 
-    if (thisTurn.turnPlayer.player === "White") {
+    if (thisTurn.turnPlayer.name === "White") {
       if (
         (fromBarIdx <= 11 && toBarIdx <= 11 && toBarIdx >= fromBarIdx) ||
         (fromBarIdx > 11 && toBarIdx > 11 && toBarIdx <= fromBarIdx) ||
@@ -108,7 +108,7 @@ export function calcGettingOutOfOutMoves(
   thisTurn: ThisTurn
 ): number[] {
   function checkForOpponent(bar: number) {
-    const opponentPlayer = thisTurn.opponentPlayer.player;
+    const opponentPlayer = thisTurn.opponentPlayer.name;
     return (
       !game.board[bar].includes(opponentPlayer) ||
       (game.board[bar].includes(opponentPlayer) && game.board[bar].length === 1)
@@ -118,7 +118,7 @@ export function calcGettingOutOfOutMoves(
   const canGoTo: number[] = [];
   const [firstDice, secondDice] = thisTurn.dices;
 
-  if (thisTurn.turnPlayer.player === "White") {
+  if (thisTurn.turnPlayer.name === "White") {
     if (firstDice > 0 && checkForOpponent(12 - firstDice)) {
       canGoTo.push(12 - firstDice);
     }
@@ -138,7 +138,7 @@ export function calcGettingOutOfOutMoves(
 }
 
 export function calcEndingDiceBars(game: Game, thisTurn: ThisTurn): number[] {
-  const turnPlayer = thisTurn.turnPlayer.player;
+  const turnPlayer = thisTurn.turnPlayer.name;
 
   function includesPlayer(bar: number) {
     return game.board[bar].includes(turnPlayer);

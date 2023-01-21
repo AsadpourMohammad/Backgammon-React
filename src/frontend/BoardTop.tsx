@@ -35,7 +35,12 @@ export default function BoardTop(props: BoardProps) {
     return (
       <Board>
         {props.game.board.map((bar, barIdx) => (
-          <CreateBar bar={bar} barIdx={barIdx} key={`${barIdx}-temp`} {...props} />
+          <CreateBar
+            bar={bar}
+            barIdx={barIdx}
+            key={`${barIdx}-temp`}
+            {...props}
+          />
         ))}
       </Board>
     );
@@ -91,10 +96,11 @@ export default function BoardTop(props: BoardProps) {
       <EndBar
         onClick={() => props.select(props.player.endBarIdx)}
         key={props.player.endBarIdx}
-        fill={props.player.player === "White" ? "#e0ded7" : "#232937"}
+        fill={props.player.name === "White" ? "#e0ded7" : "#232937"}
       >
         {props.player.endBar.map((piece, pieceIdx) => (
           <CreatePiece
+            key={`${props.player.endBarIdx}-${pieceIdx}-temp`}
             piece={piece}
             pieceIdx={pieceIdx}
             border={props.player.pieceBorderColor}

@@ -13,17 +13,18 @@ export function rollingDice(tempTurn: ThisTurn) {
   const thisTurn = new ThisTurn(
     tempTurn.turnPlayer,
     tempTurn.opponentPlayer,
-    dice()
+    dice(),
+    true
   );
 
   if (thisTurn.dices[0] === thisTurn.dices[1]) {
     toast.success(
-      `🎲 ${thisTurn.turnPlayer.player}: Rolled a Double: ${thisTurn.dices} 🎲`,
+      `🎲 ${thisTurn.turnPlayer.name}: Rolled a Double: ${thisTurn.dices} 🎲`,
       toastStyle(thisTurn)
     );
   } else {
     toast.success(
-      `🎲 ${thisTurn.turnPlayer.player}: ${thisTurn.dices} 🎲`,
+      `🎲 ${thisTurn.turnPlayer.name}: ${thisTurn.dices} 🎲`,
       toastStyle(thisTurn)
     );
   }

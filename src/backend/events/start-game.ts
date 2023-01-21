@@ -42,12 +42,12 @@ export function startingGame(game: Game): ThisTurn {
     const [blackFirst, blackSecond] = dice();
 
     if (whiteFirst + whiteSecond > blackFirst + blackSecond) {
-      thisTurn = new ThisTurn(game.whitePlayer, game.blackPlayer, []);
+      thisTurn = new ThisTurn(game.whitePlayer, game.blackPlayer, [], false);
       toast.success("The Game starts with ⚪ WHITE ⚪", toastStyle(thisTurn));
 
       break;
     } else if (whiteFirst + whiteSecond < blackFirst + blackSecond) {
-      thisTurn = new ThisTurn(game.blackPlayer, game.whitePlayer, []);
+      thisTurn = new ThisTurn(game.blackPlayer, game.whitePlayer, [], false);
       toast.success("The Game starts with ⚫ BLACK ⚫", toastStyle(thisTurn));
 
       break;

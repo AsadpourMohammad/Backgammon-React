@@ -62,9 +62,9 @@ export function selecting(
   }
 
   if (
-    thisMove.fromBarIdx === -1 &&
     typeof index === "number" &&
-    game.board[index].includes(thisTurn.opponentPlayer.player)
+    game.board[index].includes(thisTurn.opponentPlayer.name) &&
+    game.board[index].length > 1
   ) {
     toast.error("You can't select an opponent's bar.", toastStyle(thisTurn));
     return [game, thisTurn, thisMove];
@@ -101,6 +101,7 @@ export function selecting(
   }
 
   if (typeof index !== "number") {
+    toast.error("You can't select there.", toastStyle(thisTurn));
     return [game, thisTurn, thisMove];
   }
 
@@ -108,7 +109,7 @@ export function selecting(
   if (
     // Setting 'from' Main Bar
     thisMove.fromBarIdx === -1 &&
-    game.board[index].includes(thisTurn.turnPlayer.player)
+    game.board[index].includes(thisTurn.turnPlayer.name)
   ) {
     thisMove = settingFromBar(game, index, thisTurn, thisMove);
     return [game, thisTurn, thisMove];
@@ -123,11 +124,8 @@ export function selecting(
     if (!thisTurn.turnPlayer.inTheEnd && readyToEnd(game, thisTurn)) {
       thisTurn.turnPlayer.inTheEnd = true;
 
-      toast.success(`You are now at the ending area!
-        Select your ending bar & put pieces out.`),
-        {
-          duration: 9000,
-        },
+      toast.success(`${thisTurn.turnPlayer.icon} is in the ending area!
+      Select the ending bar & put pieces out.`),
         toastStyle(thisTurn);
     }
 
@@ -140,9 +138,12 @@ export function selecting(
       thisTurn = checkCantMove(game, thisTurn);
       return [game, thisTurn, thisMove];
     }
+  } else {
+    toast.error("You can't select there.", toastStyle(thisTurn));
+    return [game, thisTurn, thisMove];
   }
 
-  console.log("Why are you here?");
+  console.log("Why are you here?", thisTurn);
   return [game, thisTurn, thisMove];
 }
 
@@ -157,6 +158,8 @@ export function settingFromBar(
   if (canGoTo.length !== 0) {
     thisMove.fromBarIdx = index;
     thisMove.canGoTo = canGoTo;
+  } else {
+    toast.error("You can't select there.", toastStyle(thisTurn));
   }
 
   return thisMove;
@@ -189,6 +192,8 @@ export function settingFromEndBar(
       thisMove.fromBarIdx = index;
       thisMove.canGoTo = endingDiceBars;
       return thisMove;
+    } else {
+      toast.error("You can't select there.", toastStyle(thisTurn));
     }
   }
 

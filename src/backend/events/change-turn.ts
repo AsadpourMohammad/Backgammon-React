@@ -12,12 +12,15 @@ export function changeTurn(game: Game, thisTurn: ThisTurn): ThisTurn {
 }
 
 export function changingTurn(oldTurn: ThisTurn): ThisTurn {
-  const thisTurn = new ThisTurn(oldTurn.opponentPlayer, oldTurn.turnPlayer, []);
+  const thisTurn = new ThisTurn(
+    oldTurn.opponentPlayer,
+    oldTurn.turnPlayer,
+    [],
+    false
+  );
 
-  const turnPlayer =
-    thisTurn.turnPlayer.player === "White" ? "⚪ WHITE ⚪" : "⚫ BLACK ⚫";
-
-  toast.success("Turn is now " + turnPlayer, toastStyle(thisTurn));
+  const message = `Turn is now ${thisTurn.turnPlayer.icon}`;
+  toast.success(message, toastStyle(thisTurn));
 
   return thisTurn;
 }

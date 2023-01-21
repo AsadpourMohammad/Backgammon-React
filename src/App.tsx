@@ -15,10 +15,10 @@ export const toastStyle = (thisTurn: ThisTurn) => {
   return {
     style: {
       borderRadius: "10px",
-      background: thisTurn.turnPlayer.player,
-      color: thisTurn.opponentPlayer.player,
+      background: thisTurn.turnPlayer.name,
+      color: thisTurn.opponentPlayer.name,
       border:
-        thisTurn.turnPlayer.player === "White"
+        thisTurn.turnPlayer.name === "White"
           ? "2px solid black"
           : "2px solid white",
     },
@@ -48,7 +48,7 @@ function App() {
     if (thisTurn.rolledDice) {
       toast.error(
         "Play your move before rolling again.\n" +
-          `🎲 ${thisTurn.turnPlayer.player}: ${thisTurn.dices} 🎲`,
+          `🎲 ${thisTurn.turnPlayer.name}: ${thisTurn.dices} 🎲`,
         toastStyle(thisTurn)
       );
 

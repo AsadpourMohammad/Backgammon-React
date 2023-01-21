@@ -57,10 +57,11 @@ export default function BoardBottom(props: BoardProps) {
       >
         {props.player.outBar.map((piece, pieceIdx) => (
           <CreatePiece
+            key={`${props.player.outBarIdx}-${pieceIdx}-temp`}
             piece={piece}
             pieceIdx={pieceIdx}
             selectedPiece={
-              props.player.player === "White"
+              props.player.name === "White"
                 ? pieceIdx === props.player.outBar.length - 1
                 : pieceIdx === 0
             }

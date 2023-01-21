@@ -11,6 +11,7 @@ export default class Game {
     this._board = Game.initialState();
     this._whitePlayer = new Player(
       "White",
+      "⚪ WHITE ⚪",
       "WhiteOutBar",
       "WhiteEndBar",
       "White",
@@ -18,6 +19,7 @@ export default class Game {
     );
     this._blackPlayer = new Player(
       "Black",
+      "⚫ BLACK ⚫",
       "BlackOutBar",
       "BlackEndBar",
       "Black",

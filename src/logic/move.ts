@@ -5,11 +5,11 @@ import Player from "./player";
 
 export function settingFromEndBar(
   index: string,
-  fromBarIdx: string,
+  fromBarIdx: number | string,
   dices: number[],
-  board: string[],
+  board: string[][],
   turn: Player
-) {
+): [number | string, number[]] {
   if (readyToEnd(board, turn)) {
     const endingDiceBars = calcEndingDiceBars(board, turn, dices);
 
@@ -23,14 +23,14 @@ export function settingFromEndBar(
 }
 
 export function settingToBar(
-  index: number,
-  fromBarIdx: number,
+  index: number | string,
+  fromBarIdx: number | string,
   turn: Player,
-  dices: string[],
+  dices: number[],
   maxMoves: number,
   checkState: Function,
   changeTurn: Function
-) {
+): [boolean, number[], number] {
   var rolledDice: boolean;
 
   var toBarIdx = index;
@@ -50,24 +50,25 @@ export function settingToBar(
 
 export function settingFromOutBar(
   index: string,
-  board: string[],
+  board: string[][],
   turn: Player,
+  opponent: Player,
   dices: number[]
-) {
+): [string, number[]] {
   var fromBarIdx = index;
 
-  const canGoTo = calcGettingOutOfOutMoves(board, turn, dices);
+  const canGoTo = calcGettingOutOfOutMoves(board, turn, opponent, dices);
 
   return [fromBarIdx, canGoTo];
 }
 
 export function settingFromBar(
   index: number,
-  board: string[],
+  board: string[][],
   turn: Player,
   opponent: Player,
-  dices: string[]
-) {
+  dices: number[]
+): [number, number[]] {
   const canGoTo = calcPossibleMoves(index, board, turn, opponent, dices);
 
   if (canGoTo.length !== 0) {

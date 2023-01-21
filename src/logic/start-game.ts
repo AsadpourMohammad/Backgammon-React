@@ -62,7 +62,10 @@ export function backgammon() {
   );
 }
 
-export function startingGame(whitePlayer: Player, blackPlayer: Player) {
+export function startingGame(
+  whitePlayer: Player,
+  blackPlayer: Player
+): [Player, Player] {
   var turn: Player;
   var opponent: Player;
 

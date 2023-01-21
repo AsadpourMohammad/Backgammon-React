@@ -7,7 +7,7 @@ export function changingTurn(
   opponent: Player,
   whitePlayer: Player,
   blackPlayer: Player
-) {
+): [Player, Player] {
   turn = turn === whitePlayer ? blackPlayer : whitePlayer;
   opponent = turn === whitePlayer ? blackPlayer : whitePlayer;
 
@@ -24,7 +24,7 @@ export function calcMovesMade(
   dices: number[],
   maxMoves: number,
   changeTurn: Function
-) {
+): [boolean, number[], number] {
   var distance = 0;
 
   if (typeof fromBarIdx === "number") {

@@ -16,8 +16,7 @@ import {
 } from "./logic/move";
 import Player from "./logic/player";
 
-
-export const toastStyle = (turn) => {
+export const toastStyle = (turn: Player) => {
   return {
     style: {
       borderRadius: "10px",
@@ -28,39 +27,34 @@ export const toastStyle = (turn) => {
   };
 };
 
-export const BoardContext = createContext();
+export const BoardContext = createContext({});
 
 function App() {
   const [gameOn, setGameOn] = useState(false);
   const gameOver = useRef(false);
   const [board, setBoard] = useState(initialState());
 
-  const [turn, setTurn] = useState(new Player("", "", ""));
-  const [opponent, setOpponent] = useState(new Player("", "", ""));
+  const [turn, setTurn] = useState<Player>({} as Player);
+  const [opponent, setOpponent] = useState<Player>({} as Player);
 
-  const [whitePlayer, setWhitePlayer] = useState(
-    new Player("White", "WhiteOutBar", "WhiteEndBar")
-  );
-  const [blackPlayer, setBlackPlayer] = useState(
-    new Player("Black", "BlackOutBar", "BlackEndBar")
-  );
+  const [whitePlayer, setWhitePlayer] = useState<Player>({} as Player);
+  const [blackPlayer, setBlackPlayer] = useState<Player>({} as Player);
 
-  const rolledDice = useRef(false);
-  const dices = useRef([]);
+  const rolledDice = useRef<boolean>(false);
+  const dices = useRef<number[]>([]);
   const moves = useRef(0);
   const maxMoves = useRef(0);
+  const canGoToArray = useRef<number[]>([]);
+  const [canGoTo, setCanGoTo] = useState<number[]>([]);
 
-  const canGoToArray = useRef([]);
-  const [canGoTo, setCanGoTo] = useState([]);
-
-  const fromBarIdx = useRef(-1);
-  const toBarIdx = useRef(-1);
+  const fromBarIdx = useRef<number | string>(-1);
+  const toBarIdx = useRef<number | string>(-1);
 
   window.onload = () => backgammon();
 
   useEffect(() => {
     if (gameOver.current) {
-      celebrateGameEnd(turn.current);
+      celebrateGameEnd(turn);
       setGameOn(false);
     }
   }, [gameOver.current]);
@@ -108,9 +102,9 @@ function App() {
       return;
     }
 
-    var theTurn;
+    var theTurn: Player;
 
-    [rolledDice.current, dices.current, theTurn, maxMoves.current] =
+    [theTurn, rolledDice.current, dices.current, maxMoves.current] =
       rollingDice(turn);
 
     setTurn(theTurn);
@@ -152,23 +146,23 @@ function App() {
     return cantMove;
   }
 
-  function checkState(fromIdx, toIdx) {
+  function checkState(fromIdx: number | string, toIdx: number | string) {
     const currBoard = [...board];
 
     // Throwing opponent piece out
-    if (currBoard[toIdx].includes(opponent.player)) {
-      opponent.outBar.push(currBoard[toIdx].pop());
+    if (currBoard[toIdx as number].includes(opponent.player)) {
+      opponent.outBar.push(currBoard[toIdx as number].pop() as string);
     }
 
     // Returning an out piece
     if (fromIdx === turn.outBarIdx) {
-      currBoard[toIdx].push(turn.outBar.pop());
+      currBoard[toIdx as number].push(turn.outBar.pop() as string);
       return;
     }
 
     // Taking a piece out to end bar
-    if (fromIdx === turn.endBar) {
-      turn.endBar.push(currBoard[toIdx].pop());
+    if (fromIdx === turn.endBarIdx) {
+      turn.endBar.push(currBoard[toIdx as number].pop() as string);
 
       if (turn.endBar.length === 15) {
         gameOver.current = true;
@@ -178,12 +172,12 @@ function App() {
     }
 
     // Moving from 'from' to 'to
-    currBoard[toIdx].push(currBoard[fromIdx].pop());
+    currBoard[toIdx as number].push(currBoard[fromIdx as number].pop() as string);
 
     setBoard(currBoard);
   }
 
-  function select(index) {
+  function select(index: number | string) {
     function returnToDefault() {
       fromBarIdx.current = -1;
       toBarIdx.current = -1;
@@ -227,11 +221,11 @@ function App() {
       setCanGoTo(canGoToArray.current);
       return;
     } else if (
-      canGoToArray.current.includes(index) &&
+      canGoToArray.current.includes(index as number) &&
       fromBarIdx.current === turn.endBarIdx
     ) {
       [rolledDice.current, dices.current, maxMoves.current] = settingToBar(
-        index,
+        index as number,
         fromBarIdx.current,
         turn,
         dices.current,
@@ -250,6 +244,7 @@ function App() {
         index,
         board,
         turn,
+        opponent,
         dices.current
       );
 
@@ -258,9 +253,9 @@ function App() {
     }
 
     // Bar
-    if (fromBarIdx.current === -1 && board[index].includes(turn.player)) {
+    if (fromBarIdx.current === -1 && board[index as number].includes(turn.player)) {
       [fromBarIdx.current, canGoToArray.current] = settingFromBar(
-        index,
+        index as number,
         board,
         turn,
         opponent,
@@ -270,11 +265,11 @@ function App() {
       setCanGoTo(canGoToArray.current);
     } else if (
       toBarIdx.current === -1 &&
-      canGoToArray.current.includes(index)
+      canGoToArray.current.includes(index as number)
     ) {
       [rolledDice.current, dices.current, maxMoves.current] = settingToBar(
-        index,
         fromBarIdx.current,
+        index,
         turn,
         dices.current,
         maxMoves.current,

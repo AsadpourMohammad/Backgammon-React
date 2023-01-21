@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
 import Player from "./player";
 
-export function readyToEnd(board: string[], turn: Player) {
+export function readyToEnd(board: string[][], turn: Player): boolean {
   const containing: number[] = [];
 
   board.map((bar, barIdx) => {
@@ -31,10 +31,10 @@ export function readyToEnd(board: string[], turn: Player) {
 }
 
 export function calcEndingDiceBars(
-  board: string[],
+  board: string[][],
   turn: Player,
   dices: number[]
-) {
+): number[] {
   const canGoFrom: number[] = [];
   const [firstDice, secondDice] = dices;
 

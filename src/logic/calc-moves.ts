@@ -5,11 +5,11 @@ import Player from "./player";
 
 export function calcPossibleMoves(
   fromBarIdx: number,
-  board: string[],
+  board: string[][],
   turn: Player,
   opponent: Player,
   dices: number[]
-) {
+): number[] {
   var [firstDice, secondDice] = dices;
 
   if (firstDice === null) firstDice = 0;
@@ -67,11 +67,11 @@ export function calcPossibleMoves(
 }
 
 export function calcGettingOutOfOutMoves(
-  board: string[],
+  board: string[][],
   turn: Player,
   opponent: Player,
   dices: number[]
-) {
+): number[] {
   const canGoTo: number[] = [];
   const [firstDice, secondDice] = dices;
 
@@ -117,11 +117,11 @@ export function calcGettingOutOfOutMoves(
 export function hasPossibleMove(
   turn: Player,
   opponent: Player,
-  board: string[],
+  board: string[][],
   dices: number[],
   whitePlayer: Player,
   blackPlayer: Player
-) {
+): boolean {
   const outPieces =
     turn === whitePlayer ? [...whitePlayer.outBar] : [...blackPlayer.outBar];
   if (outPieces.length !== 0) {
@@ -148,7 +148,7 @@ export function hasPossibleMove(
 }
 
 export function checkCantMove(
-  board: string[],
+  board: string[][],
   dices: number[],
   turn: Player,
   opponent: Player,
@@ -156,7 +156,7 @@ export function checkCantMove(
   blackPlayer: Player,
   changeTurn: Function,
   setToDefault: Function
-) {
+): boolean {
   if (
     !hasPossibleMove(turn, opponent, board, dices, whitePlayer, blackPlayer)
   ) {

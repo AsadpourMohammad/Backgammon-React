@@ -33,6 +33,44 @@ export function selecting(
   }
 
   if (
+    thisTurn.turnPlayer.outBar.length == 0 &&
+    index === thisTurn.turnPlayer.outBarIdx
+  ) {
+    toast.error("You have no pieces on the out bar.", toastStyle(thisTurn));
+    return [game, thisTurn, thisMove];
+  }
+
+  if (
+    !thisTurn.turnPlayer.inTheEnd &&
+    index === thisTurn.turnPlayer.endBarIdx
+  ) {
+    toast.error(
+      `You have not brought all your pieces 
+      to the ending area yet.`,
+      toastStyle(thisTurn)
+    );
+    return [game, thisTurn, thisMove];
+  }
+
+  if (
+    thisMove.fromBarIdx === -1 &&
+    typeof index === "number" &&
+    game.board[index].length == 0
+  ) {
+    toast.error("You can't select an empty bar.", toastStyle(thisTurn));
+    return [game, thisTurn, thisMove];
+  }
+
+  if (
+    thisMove.fromBarIdx === -1 &&
+    typeof index === "number" &&
+    game.board[index].includes(thisTurn.opponentPlayer.player)
+  ) {
+    toast.error("You can't select an opponent's bar.", toastStyle(thisTurn));
+    return [game, thisTurn, thisMove];
+  }
+
+  if (
     thisTurn.turnPlayer.outBar.length !== 0 &&
     thisMove.fromBarIdx !== thisTurn.turnPlayer.outBarIdx &&
     index !== thisTurn.turnPlayer.outBarIdx
@@ -62,25 +100,34 @@ export function selecting(
     return [game, thisTurn, thisMove];
   }
 
+  if (typeof index !== "number") {
+    return [game, thisTurn, thisMove];
+  }
+
   // Main Bars
   if (
     // Setting 'from' Main Bar
     thisMove.fromBarIdx === -1 &&
-    game.board[index as number].includes(thisTurn.turnPlayer.player)
+    game.board[index].includes(thisTurn.turnPlayer.player)
   ) {
-    thisMove = settingFromBar(game, index as number, thisTurn, thisMove);
+    thisMove = settingFromBar(game, index, thisTurn, thisMove);
     return [game, thisTurn, thisMove];
   } else if (
     // Setting 'to' Bar for main, out, and end moves
     thisMove.toBarIdx === -1 &&
-    thisMove.canGoTo.includes(index as number)
+    thisMove.canGoTo.includes(index)
   ) {
-    thisTurn = settingToBar(index as number, game, thisTurn, thisMove);
+    thisTurn = settingToBar(index, game, thisTurn, thisMove);
     thisMove = newMove();
 
-    if (readyToEnd(game, thisTurn)) {
-      toast(`You have moved all your pieces to the ending bars!
-        You can now Select your ending bar to begin putting pieces out.`),
+    if (!thisTurn.turnPlayer.inTheEnd && readyToEnd(game, thisTurn)) {
+      thisTurn.turnPlayer.inTheEnd = true;
+
+      toast.success(`You are now at the ending area!
+        Select your ending bar & put pieces out.`),
+        {
+          duration: 9000,
+        },
         toastStyle(thisTurn);
     }
 

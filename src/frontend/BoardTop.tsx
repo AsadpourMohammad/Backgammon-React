@@ -15,11 +15,19 @@ interface BoardProps {
 export default function BoardTop(props: BoardProps) {
   return (
     <div className="board-top">
-      <CreateEndBar player={props.game.whitePlayer} {...props} />
+      <CreateEndBar
+        player={props.game.whitePlayer}
+        key={"left-bar"}
+        {...props}
+      />
 
       <CreateBoard />
 
-      <CreateEndBar player={props.game.blackPlayer} {...props} />
+      <CreateEndBar
+        player={props.game.blackPlayer}
+        key={"right-bar"}
+        {...props}
+      />
     </div>
   );
 
@@ -27,7 +35,7 @@ export default function BoardTop(props: BoardProps) {
     return (
       <Board>
         {props.game.board.map((bar, barIdx) => (
-          <CreateBar bar={bar} barIdx={barIdx} {...props} />
+          <CreateBar bar={bar} barIdx={barIdx} key={`${barIdx}-temp`} {...props} />
         ))}
       </Board>
     );
@@ -57,6 +65,7 @@ export default function BoardTop(props: BoardProps) {
           <CreatePiece
             piece={piece}
             pieceIdx={pieceIdx}
+            key={`${props.barIdx}-${pieceIdx}-temp`}
             border={
               (props.thisMove.fromBarIdx === props.barIdx &&
                 ((pieceIdx === 0 && props.barIdx > 11) ||
@@ -82,7 +91,7 @@ export default function BoardTop(props: BoardProps) {
       <EndBar
         onClick={() => props.select(props.player.endBarIdx)}
         key={props.player.endBarIdx}
-        fill={"#e0ded7"}
+        fill={props.player.player === "White" ? "#e0ded7" : "#232937"}
       >
         {props.player.endBar.map((piece, pieceIdx) => (
           <CreatePiece

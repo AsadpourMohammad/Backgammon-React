@@ -16,6 +16,8 @@ export function movingPiece(
       game.board[toBarIdx as number].pop() as string
     );
 
+    thisTurn.opponentPlayer.inTheEnd = false;
+
     thisTurn.opponentPlayer.player === game.whitePlayer.player
       ? (game.whitePlayer = thisTurn.opponentPlayer)
       : (game.blackPlayer = thisTurn.opponentPlayer);

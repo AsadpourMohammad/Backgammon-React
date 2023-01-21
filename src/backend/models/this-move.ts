@@ -9,6 +9,8 @@ export default class ThisMove {
     this._canGoTo = [];
   }
 
+  public static new = () => new ThisMove();
+
   public get fromBarIdx() {
     return this._fromBarIdx;
   }

@@ -1,17 +1,21 @@
 export default class Player {
   private _outBar: string[];
   private _endBar: string[];
+  private _inTheEnd: boolean;
 
   constructor(
     private readonly _player: string,
     private readonly _outBarIdx: string,
     private readonly _endBarIdx: string,
-    private readonly _pieceColor: string, 
+    private readonly _pieceColor: string,
     private readonly _pieceBorderColor: string
   ) {
     this._outBar = [];
     this._endBar = [];
+    this._inTheEnd = false;
   }
+
+  public static new = () => new Player("", "", "", "", "");
 
   public get player(): string {
     return this._player;
@@ -39,6 +43,13 @@ export default class Player {
     return this._endBarIdx;
   }
 
+  public get inTheEnd(): boolean {
+    return this._inTheEnd;
+  }
+  public set inTheEnd(value: boolean) {
+    this._inTheEnd = value;
+  }
+
   public get pieceColor(): string {
     return this._pieceColor;
   }
@@ -52,12 +63,13 @@ export default class Player {
       this._player,
       this._outBarIdx,
       this._endBarIdx,
-      this._pieceColor, 
+      this._pieceColor,
       this._pieceBorderColor
     );
 
     newPlayer.outBar = [...this.outBar];
     newPlayer.endBar = [...this.endBar];
+    newPlayer.inTheEnd = this._inTheEnd;
 
     return newPlayer;
   }

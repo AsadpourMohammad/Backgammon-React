@@ -7,7 +7,8 @@ import ThisTurn from "../models/this-turn";
 export function checkCantMove(game: Game, thisTurn: ThisTurn): ThisTurn {
   if (game.gameOn && !hasPossibleMove(game, thisTurn)) {
     toast.error(
-      "You have no possible moves.\nTurn changes to opponent.",
+      `You have no possible moves.
+      Turn changes to opponent.`,
       toastStyle(thisTurn)
     );
 
@@ -146,21 +147,29 @@ export function calcEndingDiceBars(game: Game, thisTurn: ThisTurn): number[] {
   const canGoFrom: number[] = [];
   var [firstDice, secondDice] = thisTurn.dices;
 
-  while (firstDice > 0 && secondDice > 0) {
+  while (firstDice > 0 || secondDice > 0) {
     if (turnPlayer === "White") {
-      if (includesPlayer(24 - firstDice)) {
+      if (firstDice > 0 && includesPlayer(24 - firstDice)) {
         canGoFrom.push(24 - firstDice);
       }
 
-      if (firstDice !== secondDice && includesPlayer(24 - secondDice)) {
+      if (
+        secondDice > 0 &&
+        firstDice !== secondDice &&
+        includesPlayer(24 - secondDice)
+      ) {
         canGoFrom.push(24 - secondDice);
       }
     } else {
-      if (includesPlayer(12 - firstDice)) {
+      if (firstDice > 0 && includesPlayer(12 - firstDice)) {
         canGoFrom.push(12 - firstDice);
       }
 
-      if (firstDice !== secondDice && includesPlayer(12 - secondDice)) {
+      if (
+        secondDice > 0 &&
+        firstDice !== secondDice &&
+        includesPlayer(12 - secondDice)
+      ) {
         canGoFrom.push(12 - secondDice);
       }
     }

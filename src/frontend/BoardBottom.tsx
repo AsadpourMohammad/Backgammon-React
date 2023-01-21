@@ -61,8 +61,8 @@ export default function BoardBottom(props: BoardProps) {
             pieceIdx={pieceIdx}
             selectedPiece={
               props.player.player === "White"
-              ? pieceIdx === props.player.outBar.length - 1
-              : pieceIdx === 0
+                ? pieceIdx === props.player.outBar.length - 1
+                : pieceIdx === 0
             }
             {...props}
           />

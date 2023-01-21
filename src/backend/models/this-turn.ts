@@ -6,8 +6,8 @@ export default class ThisTurn {
   private _movesMade: number;
 
   constructor(
-    private _turnPlayer: Player,
-    private _opponentPlayer: Player,
+    private readonly _turnPlayer: Player,
+    private readonly _opponentPlayer: Player,
     private _dices: number[]
   ) {
     if (this._dices.length !== 0) {
@@ -26,18 +26,14 @@ export default class ThisTurn {
     }
   }
 
+  public static new = () => new ThisTurn(Player.new(), Player.new(), []);
+
   public get turnPlayer(): Player {
     return this._turnPlayer;
-  }
-  public set turnPlayer(value: Player) {
-    this._turnPlayer = value;
   }
 
   public get opponentPlayer(): Player {
     return this._opponentPlayer;
-  }
-  public set opponentPlayer(value: Player) {
-    this._opponentPlayer = value;
   }
 
   public get rolledDice(): boolean {

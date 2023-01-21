@@ -8,15 +8,15 @@ export default class Game {
 
   constructor() {
     this._gameOn = false;
-    this._board = this.initialState();
-    this._whitePlayer = this.newPlayer(
+    this._board = Game.initialState();
+    this._whitePlayer = new Player(
       "White",
       "WhiteOutBar",
       "WhiteEndBar",
       "White",
       "1px solid black"
     );
-    this._blackPlayer = this.newPlayer(
+    this._blackPlayer = new Player(
       "Black",
       "BlackOutBar",
       "BlackEndBar",
@@ -25,7 +25,9 @@ export default class Game {
     );
   }
 
-  initialState = () => [
+  public static new = () => new Game();
+
+  public static initialState = () => [
     ["White", "White", "White", "White", "White"],
     [],
     [],
@@ -51,14 +53,6 @@ export default class Game {
     [],
     ["Black", "Black"],
   ];
-
-  newPlayer = (
-    player: string,
-    outBarIdx: string,
-    endBarIdx: string,
-    pieceColor: string,
-    pieceBorderColor: string
-  ) => new Player(player, outBarIdx, endBarIdx, pieceColor, pieceBorderColor);
 
   public get gameOn(): boolean {
     return this._gameOn;

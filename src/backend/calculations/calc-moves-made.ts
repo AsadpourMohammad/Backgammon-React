@@ -34,7 +34,10 @@ export function calcMovesMade(
 
   thisTurn.movesMade = distance;
 
-  if (thisTurn.movesMade === thisTurn.dices[0]) {
+  if (
+    thisTurn.movesMade === thisTurn.dices[0] ||
+    (thisTurn.turnPlayer.inTheEnd && distance <= thisTurn.dices[0])
+  ) {
     thisTurn.maxMoves -= thisTurn.dices.shift() as number;
   } else if (thisTurn.movesMade === thisTurn.dices[1]) {
     thisTurn.maxMoves -= thisTurn.dices.pop() as number;

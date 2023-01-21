@@ -3,8 +3,6 @@ import { toast } from "react-hot-toast";
 import "./App.css";
 import { checkCantMove } from "./backend/calculations/calc-possible-moves";
 import BoardTop from "./frontend/BoardTop";
-import OutBar from "./frontend/components/OutBar";
-import Piece from "./frontend/components/Piece";
 import ThisTurn from "./backend/models/this-turn";
 import Game from "./backend/models/game";
 import ThisMove from "./backend/models/this-move";
@@ -28,21 +26,22 @@ export const toastStyle = (thisTurn: ThisTurn) => {
 };
 
 function App() {
-  const newGame = () => new Game();
-
-  const [game, setGame] = useState(newGame);
-  const [thisTurn, setThisTurn] = useState({} as ThisTurn);
-  const [thisMove, setThisMove] = useState(new ThisMove());
+  const [game, setGame] = useState(Game.new);
+  const [thisTurn, setThisTurn] = useState(ThisTurn.new);
+  const [thisMove, setThisMove] = useState(ThisMove.new);
 
   window.onload = () => backgammon();
 
   function startGame() {
-    const tempGame = newGame();
+    const tempGame = Game.new();
     tempGame.gameOn = true;
     setGame(tempGame);
 
     const tempThisTurn = startingGame(game.clone());
     setThisTurn(tempThisTurn);
+
+    const tempThisMove = ThisMove.new();
+    setThisMove(tempThisMove);
   }
 
   function rollDice() {

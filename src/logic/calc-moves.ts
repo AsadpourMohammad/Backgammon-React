@@ -1,15 +1,21 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../App";
 import { calcEndingDiceBars } from "./endgame";
+import Player from "./player";
 
-export function calcPossibleMoves(fromBarIdx, board, turn, opponent, dices) {
-  console.log(dices);
-  const [firstDice, secondDice] = dices;
+export function calcPossibleMoves(
+  fromBarIdx: number,
+  board: string[],
+  turn: Player,
+  opponent: Player,
+  dices: number[]
+) {
+  var [firstDice, secondDice] = dices;
 
   if (firstDice === null) firstDice = 0;
   if (secondDice === null) secondDice = 0;
 
-  const canGoTo = [];
+  const canGoTo: number[] = [];
 
   for (let i = 0; i < board.length; i++) {
     var toBar = board[i];
@@ -60,8 +66,13 @@ export function calcPossibleMoves(fromBarIdx, board, turn, opponent, dices) {
   return canGoTo;
 }
 
-export function calcGettingOutOfOutMoves(board, turn, opponent, dices) {
-  const canGoTo = [];
+export function calcGettingOutOfOutMoves(
+  board: string[],
+  turn: Player,
+  opponent: Player,
+  dices: number[]
+) {
+  const canGoTo: number[] = [];
   const [firstDice, secondDice] = dices;
 
   if (turn.player === "White") {
@@ -104,12 +115,12 @@ export function calcGettingOutOfOutMoves(board, turn, opponent, dices) {
 }
 
 export function hasPossibleMove(
-  turn,
-  opponent,
-  board,
-  dices,
-  whitePlayer,
-  blackPlayer
+  turn: Player,
+  opponent: Player,
+  board: string[],
+  dices: number[],
+  whitePlayer: Player,
+  blackPlayer: Player
 ) {
   const outPieces =
     turn === whitePlayer ? [...whitePlayer.outBar] : [...blackPlayer.outBar];
@@ -118,12 +129,12 @@ export function hasPossibleMove(
     return canGoTo.length !== 0;
   }
 
-  const containing = [];
+  const containing: number[] = [];
   board.map((bar, barIdx) => {
     if (bar.includes(turn.player)) containing.push(barIdx);
   });
 
-  const allMoves = [];
+  const allMoves: number[] = [];
   containing.map((barIdx) => {
     const canGoTo = calcPossibleMoves(barIdx, board, turn, opponent, dices);
 
@@ -137,14 +148,14 @@ export function hasPossibleMove(
 }
 
 export function checkCantMove(
-  board,
-  dices,
-  turn,
-  opponent,
-  whitePlayer,
-  blackPlayer,
-  changeTurn,
-  setToDefault
+  board: string[],
+  dices: number[],
+  turn: Player,
+  opponent: Player,
+  whitePlayer: Player,
+  blackPlayer: Player,
+  changeTurn: Function,
+  setToDefault: Function
 ) {
   if (
     !hasPossibleMove(turn, opponent, board, dices, whitePlayer, blackPlayer)

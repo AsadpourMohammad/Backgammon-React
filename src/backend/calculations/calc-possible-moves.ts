@@ -144,32 +144,29 @@ export function calcEndingDiceBars(game: Game, thisTurn: ThisTurn): number[] {
   }
 
   const canGoFrom: number[] = [];
-  const [firstDice, secondDice] = thisTurn.dices;
+  var [firstDice, secondDice] = thisTurn.dices;
 
-  if (turnPlayer === "White") {
-    if (firstDice > 0 && includesPlayer(24 - firstDice)) {
-      canGoFrom.push(24 - firstDice);
+  while (firstDice > 0 && secondDice > 0) {
+    if (turnPlayer === "White") {
+      if (includesPlayer(24 - firstDice)) {
+        canGoFrom.push(24 - firstDice);
+      }
+
+      if (firstDice !== secondDice && includesPlayer(24 - secondDice)) {
+        canGoFrom.push(24 - secondDice);
+      }
+    } else {
+      if (includesPlayer(12 - firstDice)) {
+        canGoFrom.push(12 - firstDice);
+      }
+
+      if (firstDice !== secondDice && includesPlayer(12 - secondDice)) {
+        canGoFrom.push(12 - secondDice);
+      }
     }
 
-    if (
-      secondDice > 0 &&
-      firstDice !== secondDice &&
-      includesPlayer(24 - secondDice)
-    ) {
-      canGoFrom.push(24 - secondDice);
-    }
-  } else {
-    if (firstDice > 0 && includesPlayer(12 - firstDice)) {
-      canGoFrom.push(12 - firstDice);
-    }
-
-    if (
-      secondDice > 0 &&
-      firstDice !== secondDice &&
-      includesPlayer(12 - secondDice)
-    ) {
-      canGoFrom.push(12 - secondDice);
-    }
+    firstDice--;
+    secondDice--;
   }
   return canGoFrom;
 }

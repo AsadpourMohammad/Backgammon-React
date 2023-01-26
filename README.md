@@ -22,8 +22,6 @@ A game of <b>Backgammon</b> made with <b>React</b> and <b>Typescript</b>. It can
     <img width="40%" src="https://user-images.githubusercontent.com/107719378/214806604-8e1e6f07-2b9c-4e36-bec5-a8e1e9e139e8.png">
 </p>
 
-
-
 [Back To The Top](#backgammon)
 
 ---
@@ -33,6 +31,8 @@ A game of <b>Backgammon</b> made with <b>React</b> and <b>Typescript</b>. It can
 First, install `Node.js` in your system.\
 Then, after cloning the repository, use `npm install` to install the needed dependencies.\
 Finally, use `npm run dev` to open a local server and run the code.
+
+You can also play the game online at [github pages](https://asadpourmohammad.github.io/Backgammon/).
 
 [Back To The Top](#backgammon)
 

@@ -19,12 +19,12 @@
 A game of <b>Backgammon</b> made with <b>React</b> and <b>Typescript</b>. It can be played by two players.
 
 <p align="center" width="100%">
-    <img width="70%" src="https://user-images.githubusercontent.com/107719378/214806604-8e1e6f07-2b9c-4e36-bec5-a8e1e9e139e8.png">
+    <img width="40%" src="https://user-images.githubusercontent.com/107719378/214806604-8e1e6f07-2b9c-4e36-bec5-a8e1e9e139e8.png">
 </p>
 
 
 
-[Back To The Top](#tictactoe)
+[Back To The Top](#backgammon)
 
 ---
 
@@ -34,7 +34,7 @@ First, install `Node.js` in your system.\
 Then, after cloning the repository, use `npm install` to install the needed dependencies.\
 Finally, use `npm run dev` to open a local server and run the code.
 
-[Back To The Top](#tictactoe)
+[Back To The Top](#backgammon)
 
 ---
 
@@ -42,4 +42,4 @@ Finally, use `npm run dev` to open a local server and run the code.
 
 This game was made by Mohammad Asadpour as the final Project of the Data Structure course of the fall semester of 1401 in Babol Noshirvani University of Technology (BNUT or NIT).
 
-[Back To The Top](#tictactoe)
+[Back To The Top](#backgammon)

@@ -47,8 +47,8 @@ function App() {
   function rollDice() {
     if (thisTurn.rolledDice) {
       toast.error(
-        "Play your move first.\n" +
-          `${thisTurn.turnPlayer.icon} 🎲 ${thisTurn.dices} 🎲`,
+        `Play your move first
+          ${thisTurn.turnPlayer.icon} 🎲 ${thisTurn.dices} 🎲`,
         toastStyle(thisTurn)
       );
 

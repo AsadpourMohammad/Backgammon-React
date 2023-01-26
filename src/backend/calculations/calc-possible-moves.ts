@@ -100,6 +100,7 @@ export function calcPossibleMoves(
 
     canGoTo.push(toBarIdx);
   }
+  
   return canGoTo;
 }
 

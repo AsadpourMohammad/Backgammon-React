@@ -1,7 +1,12 @@
 import { toast } from "react-hot-toast";
 import { toastStyle } from "../../App";
 import { calcMovesMade } from "../calculations/calc-moves-made";
-import { calcEndingDiceBars, calcGettingOutOfOutMoves, calcPossibleMoves, checkCantMove } from "../calculations/calc-possible-moves";
+import {
+  calcEndingDiceBars,
+  calcGettingOutOfOutMoves,
+  calcPossibleMoves,
+  checkCantMove,
+} from "../calculations/calc-possible-moves";
 import Game from "../models/game";
 import ThisMove from "../models/this-move";
 import ThisTurn from "../models/this-turn";
@@ -31,7 +36,7 @@ export function selecting(
     thisTurn.turnPlayer.outBar.length == 0 &&
     index === thisTurn.turnPlayer.outBarIdx
   ) {
-    toast.error("You have no pieces on the out bar.", toastStyle(thisTurn));
+    toast.error("You have no pieces on out bar.", toastStyle(thisTurn));
     return [game, thisTurn, thisMove];
   }
 
@@ -100,7 +105,7 @@ export function selecting(
   }
 
   if (typeof index !== "number") {
-    toast.error("You can't select there.", toastStyle(thisTurn));
+    toast.error("You can't select opponent's bar.", toastStyle(thisTurn));
     return [game, thisTurn, thisMove];
   }
 

@@ -131,9 +131,9 @@ export default function BoardTop(props: BoardProps) {
         border={props.border}
         color={props.piece}
       >
-        {(props.bar.length > 6 && 
-        ((props.pieceIdx === 0 && props.barIdx > 11) ||
-          (props.pieceIdx === 5 && props.barIdx <= 11))) && (
+        {props.bar.length > 6 &&
+          ((props.pieceIdx === 0 && props.barIdx > 11) ||
+            (props.pieceIdx === 5 && props.barIdx <= 11)) && (
             <>{props.bar.length - 6}</>
           )}
       </Piece>

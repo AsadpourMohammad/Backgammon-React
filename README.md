@@ -32,7 +32,7 @@ First, install `Node.js` in your system.\
 Then, after cloning the repository, use `npm install` to install the needed dependencies.\
 Finally, use `npm run dev` to open a local server and run the code.
 
-You can also play the game online at [github pages](https://asadpourmohammad.github.io/Backgammon/).
+You can also play the game online at [github pages](https://asadpourmohammad.github.io/Backgammon-React/).
 
 [Back To The Top](#backgammon)
 

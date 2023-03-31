@@ -1,6 +1,6 @@
-import Game from "../backend/models/game";
-import Player from "../backend/models/player";
-import ThisMove from "../backend/models/this-move";
+import Game from "../logic/models/game";
+import Player from "../logic/models/player";
+import ThisMove from "../logic/models/this-move";
 import OutBar from "./components/OutBar";
 import Piece from "./components/Piece";
 
@@ -56,7 +56,7 @@ export default function BoardBottom(props: BoardProps) {
         fill={props.fill}
       >
         {props.player.outBar.map(
-          (piece, pieceIdx) =>
+          (piece: string, pieceIdx: number) =>
             pieceIdx < 6 && (
               <CreatePiece
                 key={`${props.player.outBarIdx}-${pieceIdx}-temp`}

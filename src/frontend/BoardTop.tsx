@@ -1,6 +1,6 @@
-import Game from "../backend/models/game";
-import Player from "../backend/models/player";
-import ThisMove from "../backend/models/this-move";
+import Game from "../logic/models/game";
+import Player from "../logic/models/player";
+import ThisMove from "../logic/models/this-move";
 import Bar from "./components/Bar";
 import Board from "./components/Board";
 import EndBar from "./components/EndBar";
@@ -34,7 +34,7 @@ export default function BoardTop(props: BoardProps) {
   function CreateBoard() {
     return (
       <Board>
-        {props.game.board.map((bar, barIdx) => (
+        {props.game.board.map((bar: string[], barIdx: number) => (
           <CreateBar
             bar={bar}
             barIdx={barIdx}
@@ -67,7 +67,7 @@ export default function BoardTop(props: BoardProps) {
         }
       >
         {props.bar.map(
-          (piece, pieceIdx) =>
+          (piece: string, pieceIdx: number) =>
             pieceIdx < 6 && (
               <CreatePiece
                 piece={piece}
